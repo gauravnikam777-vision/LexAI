@@ -1,0 +1,25 @@
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Python cache and compile artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Private environment config
+.env
+
+# Local Database
+database.db
+
+# IDE configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

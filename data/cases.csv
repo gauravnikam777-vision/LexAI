@@ -1,0 +1,101 @@
+case_id,text,category,risk_level,outcome
+1,"Tenant refused to vacate property after lease expiry. Landlord seeking eviction and unpaid rent recovery of 6 months.",property,High,win
+2,"Employee terminated without notice or severance pay after 5 years of service. Seeking compensation.",labour,Medium,win
+3,"Credit card fraud committed using stolen identity. Unauthorized transactions worth 50000.",fraud,High,lose
+4,"Boundary dispute between neighbors over shared wall construction damaging adjacent property.",property,Medium,win
+5,"Company failed to pay employee overtime wages for 2 years despite repeated requests.",labour,High,win
+6,"Online scam targeting elderly citizens through fake investment scheme.",fraud,High,lose
+7,"Wrongful termination of pregnant employee. Employer claims performance issues.",labour,High,win
+8,"Property sold without disclosing structural defects. Buyer seeking rescission of contract.",property,High,win
+9,"Insurance fraud involving staged car accident to claim policy benefits.",fraud,Medium,lose
+10,"Construction workers not provided safety equipment. Injury occurred on site.",labour,Medium,win
+11,"Tenant illegally subletting property without landlord consent. Seeking damages.",property,Low,win
+12,"Cheque bounce case for business transaction of 200000 rupees.",fraud,Medium,win
+13,"Sexual harassment complaint against supervisor in corporate office.",labour,High,win
+14,"Illegal encroachment on government land by private developer.",property,High,lose
+15,"Fake degree certificates used for job application. Employer seeking damages.",fraud,Low,win
+16,"Employee denied maternity leave benefits as per statutory requirements.",labour,Medium,win
+17,"Property inheritance dispute among siblings after father death.",property,Medium,lose
+18,"Ponzi scheme defrauding 500 investors over 3 years.",fraud,High,lose
+19,"Contract worker denied minimum wage and provident fund contributions.",labour,High,win
+20,"Forcible eviction of tenant without court order. Seeking reinstatement.",property,High,win
+21,"Bank fraud through manipulation of loan documents by bank officer.",fraud,High,lose
+22,"Discrimination based on caste in workplace promotions.",labour,High,win
+23,"Joint property sold by one co-owner without consent of others.",property,High,win
+24,"Cybercrime involving phishing attack stealing banking credentials.",fraud,Medium,lose
+25,"Child labor complaint against small manufacturing unit.",labour,High,win
+26,"Illegal demolition of protected heritage structure.",property,Medium,lose
+27,"Investment fraud through unauthorized portfolio management.",fraud,High,lose
+28,"Employee provident fund not deposited by employer for 3 years.",labour,Medium,win
+29,"Agricultural land conversion without proper permissions.",property,Medium,lose
+30,"SIM card swap fraud resulting in loss of savings account funds.",fraud,High,lose
+31,"Dispute over property registered under benami transaction.",property,High,lose
+32,"Delayed salary payment affecting livelihood of daily wage workers.",labour,Low,win
+33,"Credit card cloning and unauthorized international transactions.",fraud,Medium,lose
+34,"Illegal mining on private forest land causing environmental damage.",property,High,lose
+35,"Company not providing employee state insurance contributions.",labour,Medium,win
+36,"Real estate developer fraud failing to deliver flats after collecting full payment.",fraud,High,lose
+37,"Encroachment of water body by real estate project.",property,High,lose
+38,"Retrenchment without following proper legal procedure.",labour,High,win
+39,"Fake currency notes used in market transactions.",fraud,Medium,lose
+40,"Society maintenance fraud by housing society committee.",fraud,Low,lose
+41,"Property mortgage fraud through forged documents.",fraud,High,lose
+42,"Non-payment of gratuity to long-serving employees.",labour,Medium,win
+43,"Illegal floor construction violating building bye-laws.",property,Low,lose
+44,"Email phishing resulting in corporate data breach.",fraud,Medium,lose
+45,"Forced resignation through workplace harassment.",labour,High,win
+46,"Builder not registering sale deed despite full payment.",property,High,win
+47,"Multi-level marketing scheme defrauding thousands of participants.",fraud,High,lose
+48,"Violation of equal pay for equal work principle.",labour,Medium,win
+49,"Property acquired through coercion and undue influence.",property,High,win
+50,"Identity theft used to obtain multiple loans from banks.",fraud,High,lose
+51,"Dispute over agricultural land boundaries affecting irrigation.",property,Medium,win
+52,"Employer refusing to issue experience certificate after resignation.",labour,Low,win
+53,"Advance payment taken for flat but construction never started.",fraud,High,lose
+54,"Retaliatory dismissal after filing safety complaint.",labour,High,win
+55,"Illegal occupation of common areas in residential society.",property,Low,win
+56,"Trademark infringement by competitor using similar brand name.",fraud,Medium,win
+57,"Non-compete clause enforced unfairly after employment termination.",labour,Medium,lose
+58,"Will contested claiming forgery and undue influence.",property,High,lose
+59,"Vendor fraud through supply of substandard materials.",fraud,Medium,win
+60,"Denial of promotion based on religious discrimination.",labour,High,win
+61,"Landlord refusing to return security deposit after tenant vacated flat claiming false damage.",property,Medium,win
+62,"Employer not paying security deposit refund to employee who left.",labour,Low,win
+63,"Landlord did not return deposit money despite no damage to the flat after leaving.",property,Medium,win
+64,"Security deposit withheld by landlord without valid reason after vacating house.",property,Medium,win
+65,"Tenant vacated house but landlord refuses to give back rental deposit of 50000.",property,Medium,win
+66,"Employee salary not paid for three months by employer.",labour,High,win
+67,"Company refusing to pay monthly wages to workers for several months.",labour,High,win
+68,"Employer not releasing final salary dues after resignation.",labour,Medium,win
+69,"Employee not getting paid on time repeatedly by employer.",labour,Medium,win
+70,"Workers not receiving payment for work done over past months.",labour,High,win
+71,"Builder fraud where advance payment taken but flat never delivered.",fraud,High,lose
+72,"Real estate developer collected booking amount but never started construction of flat.",fraud,High,lose
+73,"Paid full amount to builder for apartment but never received possession.",fraud,High,lose
+74,"Developer took money for flat and disappeared without delivering property.",fraud,High,lose
+75,"Cheque dishonored by bank after goods were delivered based on cheque.",fraud,Medium,win
+76,"Dishonored cheque of rupees two lakh for business transaction.",fraud,Medium,win
+77,"Customer gave bounced cheque for purchase of goods worth one lakh.",fraud,Medium,win
+78,"Cheque returned unpaid by bank despite sufficient funds claimed by customer.",fraud,Medium,win
+79,"Employer did not deposit provident fund PF for employees for two years.",labour,Medium,win
+80,"PF not remitted to EPFO by employer causing financial loss to employees.",labour,Medium,win
+81,"Provident fund deducted from salary but not deposited with government.",labour,High,win
+82,"Company deducting ESI and PF from salary but not depositing to government accounts.",labour,High,win
+83,"Workplace sexual harassment complaint filed against manager ignored by HR.",labour,High,win
+84,"Female employee harassed by senior colleague and management taking no action.",labour,High,win
+85,"Sexual harassment at office by supervisor creating hostile work environment.",labour,High,win
+86,"Neighbor encroached on my land by constructing boundary wall inside my property.",property,Medium,win
+87,"Illegal construction on my plot by adjacent property owner.",property,Medium,win
+88,"Wrongful encroachment on agricultural land by neighbor changing boundary marks.",property,Medium,win
+89,"Online cyber fraud where money transferred through phishing bank link.",fraud,High,lose
+90,"Received fake call from bank and shared OTP resulting in money stolen.",fraud,High,lose
+91,"Identity stolen and used for unauthorized online transactions.",fraud,High,lose
+92,"Inheritance dispute over ancestral property among family members.",property,Medium,lose
+93,"Siblings fighting over property after death of father without will.",property,High,lose
+94,"Will forged to claim property denying rightful heirs their share.",property,High,lose
+95,"Employer fired employee who raised safety concern as retaliation.",labour,High,win
+96,"Worker dismissed after reporting accident at factory to authorities.",labour,High,win
+97,"Dismissed from job after complaining about unsafe working conditions.",labour,High,win
+98,"Employer not following proper retrenchment procedure as per Industrial Disputes Act.",labour,High,win
+99,"Company laying off workers without compensation violating labour law.",labour,High,win
+100,"Employee terminated without giving mandatory one month notice period.",labour,Medium,win

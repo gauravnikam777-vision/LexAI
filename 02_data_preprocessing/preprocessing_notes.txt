@@ -1,0 +1,84 @@
+PREPROCESSING NOTES — LexAI Project
+=====================================
+Author: Gaurav Govind Nikam
+Last updated: March 2025
+
+These are my personal notes on what worked and what didn't during preprocessing.
+Keeping them here for reference when writing the project report.
+
+----------------------------------------------------------------------
+EXPERIMENT 1: NLTK Stopwords (FAILED)
+----------------------------------------------------------------------
+First I tried using standard NLTK English stopwords:
+
+    from nltk.corpus import stopwords
+    stop = set(stopwords.words('english'))
+
+Problem: NLTK removed "not", "no", "without" etc which are VERY important
+in legal text. For example:
+  - "police NOT filing FIR" → "police filing FIR" (completely wrong meaning)
+  - "employer did NOT pay salary" → "employer pay salary" (also wrong)
+
+Fix: Switched to custom stopword list. Only removed very common words
+like "the", "a", "an", "is" etc.
+
+----------------------------------------------------------------------
+EXPERIMENT 2: Removing Numbers (FAILED)
+----------------------------------------------------------------------
+Thought numbers are noise, so removed all digits.
+
+Problem: IPC section numbers are key features!
+  - "Section 420" → "" (lost cheating offense identifier)
+  - "Section 138" → "" (lost cheque bounce identifier)
+  - "Section 498A" → "" (lost dowry cruelty identifier)
+
+Fix: Kept alphanumeric characters. Section numbers preserved.
+
+----------------------------------------------------------------------
+EXPERIMENT 3: TF-IDF max_features (TUNED)
+----------------------------------------------------------------------
+Tried different values:
+  - max_features=1000: Too few, important legal terms missed
+  - max_features=3000: Better but category model getting confused
+  - max_features=5000: Good balance — settled on this
+  - max_features=10000: Overfitting, test accuracy dropped
+
+Final: max_features=5000, ngram_range=(1,2)
+
+Bigrams help a lot — "property dispute" is better than just "property" + "dispute"
+
+----------------------------------------------------------------------
+EXPERIMENT 4: min_df filtering
+----------------------------------------------------------------------
+min_df=1: Too many rare words, slow and noisy
+min_df=3: Some important legal terms lost (they appear rarely)
+min_df=2: Good balance — kept this
+
+----------------------------------------------------------------------
+EXPERIMENT 5: Class Imbalance
+----------------------------------------------------------------------
+Original dataset distribution:
+  fraud:          45 cases  (most)
+  criminal:       38 cases
+  property:       32 cases
+  labour:         28 cases
+  family:         25 cases
+  motor_accident: 18 cases  (least)
+  consumer:       16 cases  (least)
+
+Problem: Model was predicting 'fraud' for everything.
+
+Fix: Added more cases manually for minority classes (consumer, motor_accident).
+Also tried class_weight='balanced' in RandomForest → helped a lot.
+
+----------------------------------------------------------------------
+KEY LEARNING
+----------------------------------------------------------------------
+For legal text, domain-specific preprocessing > generic NLP preprocessing.
+Indian legal text has unique patterns (Hinglish, IPC references, etc.)
+that standard NLP pipelines don't handle well.
+
+Next time I would try:
+- Fine-tuned BERT on Indian legal corpus (but needs GPU + large dataset)
+- Legal-specific word embeddings
+- Better data augmentation for minority classes

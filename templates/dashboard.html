@@ -1,0 +1,3174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>/* Theme FOUC prevention - must run before CSS */(function(){var t=localStorage.getItem('lexai-theme')||'dark';document.documentElement.setAttribute('data-theme',t);document.documentElement.style.colorScheme=t==='light'?'light':'dark';}());</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexAI – Legal Intelligence Platform</title>
+  <meta name="description" content="LexAI – AI-powered Indian Legal Assistant. Role-based platform for Clients, Lawyers, Admins and Chatbot Managers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --bg:        #0f172a;
+      --bg-card:   #1e293b;
+      --bg-el:     #263548;
+      --accent:    #3b82f6;
+      --gold:      #f59e0b;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --purple:    #8b5cf6;
+      --cyan:      #06b6d4;
+      --txt:       #f1f5f9;
+      --txt-muted: #94a3b8;
+      --border:    rgba(255,255,255,0.07);
+      --shadow:    0 4px 24px rgba(0,0,0,0.4);
+      --radius:    12px;
+      --transition: 0.2s ease;
+      --sidebar-w: 240px;
+    }
+
+    /* ═══════════════════════════════════════
+       LIGHT THEME OVERRIDE
+    ═══════════════════════════════════════ */
+    [data-theme="light"] {
+      --bg:        #f1f5f9;
+      --bg-card:   #ffffff;
+      --bg-el:     #e8edf5;
+      --txt:       #0f172a;
+      --txt-muted: #475569;
+      --border:    rgba(0,0,0,0.09);
+      --shadow:    0 4px 24px rgba(0,0,0,0.12);
+    }
+    [data-theme="light"] #sidebar { background:#ffffff; border-right-color:rgba(0,0,0,0.09); }
+    [data-theme="light"] #topbar { background:rgba(248,250,252,0.96); border-bottom-color:rgba(0,0,0,0.09); }
+    [data-theme="light"] .sb-link { color:#475569; }
+    [data-theme="light"] .sb-link:hover { background:#f1f5f9; color:#0f172a; }
+    [data-theme="light"] .sb-link.active { background:rgba(59,130,246,0.1); color:var(--accent); }
+    [data-theme="light"] .sb-section { color:#94a3b8; }
+    [data-theme="light"] .sb-credits { color:#64748b; }
+    [data-theme="light"] .brand-logo { background:linear-gradient(135deg,#2563eb,#d97706); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    [data-theme="light"] input,[data-theme="light"] textarea,[data-theme="light"] select { background:#f8fafc; color:#0f172a; border-color:rgba(0,0,0,0.12); }
+    [data-theme="light"] select option { background:#fff; color:#0f172a; }
+    [data-theme="light"] .card,.stat-card { background:#ffffff; }
+    [data-theme="light"] .stat-card { background:#ffffff; }
+    [data-theme="light"] .chat-container { background:#ffffff; }
+    [data-theme="light"] .ml-panel { background:#ffffff; }
+    [data-theme="light"] .msg-ai .msg-bubble { background:#f1f5f9; color:#0f172a; border-color:rgba(0,0,0,0.08); }
+    [data-theme="light"] .chip { background:rgba(59,130,246,0.08); border-color:rgba(59,130,246,0.2); }
+    [data-theme="light"] .chip:hover { background:var(--accent); color:white; }
+    [data-theme="light"] .tbl th { background:#f8fafc; color:#475569; }
+    [data-theme="light"] .tbl td { color:#0f172a; }
+    [data-theme="light"] .tbl tr:hover td { background:rgba(0,0,0,0.02); }
+    [data-theme="light"] .log-item,.intent-card,.note-card,.case-card { background:#ffffff; }
+    [data-theme="light"] .queue-list,.case-detail-box { background:#ffffff; }
+    [data-theme="light"] .modal-box { background:#ffffff; }
+    [data-theme="light"] .bar-track { background:#e2e8f0; }
+    [data-theme="light"] .ml-box { background:#f8fafc; }
+    [data-theme="light"] .ml-box-value { color:#0f172a; }
+    [data-theme="light"] .win-ring-inner { background:#f8fafc; }
+    [data-theme="light"] .typing-indicator { background:#f1f5f9; border-color:rgba(0,0,0,0.1); }
+    [data-theme="light"] .typing-indicator span { background:#94a3b8; }
+    [data-theme="light"] .badge-gray { background:rgba(71,85,105,0.12); color:#475569; }
+    [data-theme="light"] .logout-btn { background:rgba(239,68,68,0.08); }
+    [data-theme="light"] .ml-empty i { opacity:0.2; }
+    [data-theme="light"] .queue-item { border-bottom-color:rgba(0,0,0,0.06); }
+    [data-theme="light"] .queue-item:hover { background:#f8fafc; }
+    [data-theme="light"] .queue-item.selected { background:rgba(59,130,246,0.07); }
+    [data-theme="light"] #notifDropdown { background:#ffffff; box-shadow:0 8px 32px rgba(0,0,0,0.15); }
+    [data-theme="light"] .activity-item { border-bottom-color:rgba(0,0,0,0.06); }
+    [data-theme="light"] .settings-row { border-bottom-color:rgba(0,0,0,0.06); }
+    [data-theme="light"] hr { border-top-color:rgba(0,0,0,0.08); }
+
+    /* ═══════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; outline: none; }
+    input, textarea, select {
+      font-family: 'Inter', sans-serif;
+      color: var(--txt);
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    select option { background: var(--bg-card); color: var(--txt); }
+
+    /* ═══════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-el); border-radius: 10px; }
+
+    /* ═══════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════ */
+    #sidebar {
+      position: fixed; left: 0; top: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      z-index: 200;
+      overflow-y: auto;
+    }
+    .sb-brand {
+      padding: 20px 16px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sb-brand .brand-logo {
+      font-size: 22px; font-weight: 800;
+      background: linear-gradient(135deg, #58a6ff, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .sb-brand small {
+      display: block; font-size: 10px; color: var(--txt-muted);
+      margin-top: 2px; letter-spacing: 0.3px;
+    }
+    .sb-user {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sb-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; flex-shrink: 0;
+    }
+    .sb-user-info { min-width: 0; }
+    .sb-username { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-role { font-size: 10px; padding: 1px 6px; border-radius: 20px; margin-top: 2px; display: inline-block; }
+
+    .sb-nav { flex: 1; padding: 8px 0; }
+    .sb-section {
+      padding: 8px 16px 3px;
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px;
+      color: var(--txt-muted); font-weight: 600; margin-top: 4px;
+    }
+    .sb-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 16px;
+      font-size: 13px; color: var(--txt-muted);
+      border-left: 3px solid transparent;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .sb-link:hover { background: var(--bg-el); color: var(--txt); }
+    .sb-link.active {
+      background: rgba(59,130,246,0.12);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    .sb-link i { width: 16px; text-align: center; font-size: 13px; }
+    .sb-link .badge {
+      margin-left: auto; background: var(--accent);
+      color: white; font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    .sb-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+    }
+    .logout-btn {
+      width: 100%; padding: 8px;
+      background: rgba(239,68,68,0.1);
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px;
+      font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all var(--transition);
+    }
+    .logout-btn:hover { background: rgba(239,68,68,0.2); border-color: var(--red); }
+    .sb-credits {
+      text-align: center; font-size: 10px; color: var(--txt-muted);
+      margin-top: 8px; line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════ */
+    #main {
+      margin-left: var(--sidebar-w);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* TOPBAR */
+    #topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #pageTitle { font-size: 15px; font-weight: 700; color: var(--txt); }
+    .topbar-right {
+      display: flex; align-items: center; gap: 16px;
+      font-size: 12px; color: var(--txt-muted);
+    }
+    .online-dot {
+      display: inline-flex; align-items: center; gap: 5px;
+      color: var(--green);
+    }
+    .online-dot::before {
+      content: ''; width: 7px; height: 7px;
+      background: var(--green); border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+    .topbar-time { color: var(--txt-muted); font-size: 11px; }
+
+    /* CONTENT AREA */
+    .content { padding: 24px; flex: 1; }
+
+    /* PANELS */
+    .panel { display: none; animation: fadeIn 0.25s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ═══════════════════════════════════════
+       CARDS / GLASS COMPONENTS
+    ═══════════════════════════════════════ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .glass {
+      background: rgba(30,41,59,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    /* STAT CARDS */
+    .stats-grid { display: grid; gap: 16px; margin-bottom: 24px; }
+    .stats-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .stats-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .stats-grid-5 { grid-template-columns: repeat(5, 1fr); }
+    .stats-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      position: relative; overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .stat-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+    }
+    .stat-card.blue::before { background: var(--accent); }
+    .stat-card.gold::before { background: var(--gold); }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.red::before { background: var(--red); }
+    .stat-card.purple::before { background: var(--purple); }
+    .stat-card.cyan::before { background: var(--cyan); }
+
+    .stat-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; margin-bottom: 12px;
+    }
+    .stat-icon.blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+    .stat-icon.gold { background: rgba(245,158,11,0.15); color: var(--gold); }
+    .stat-icon.green { background: rgba(16,185,129,0.15); color: var(--green); }
+    .stat-icon.red { background: rgba(239,68,68,0.15); color: var(--red); }
+    .stat-icon.purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+    .stat-icon.cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
+
+    .stat-number {
+      font-size: 30px; font-weight: 800; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label { font-size: 11px; color: var(--txt-muted); font-weight: 500; }
+
+    /* SECTION HEADING */
+    .sec-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .sec-head h3 {
+      font-size: 14px; font-weight: 700;
+      color: var(--txt); display: flex; align-items: center; gap: 8px;
+    }
+    .sec-head h3 span { color: var(--accent); }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      transition: all var(--transition); cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn-success { background: var(--green); color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: var(--red); color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warning { background: var(--gold); color: #1a1a1a; font-weight: 700; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-ghost {
+      background: transparent; color: var(--txt-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--bg-el); color: var(--txt); }
+    .btn-sm { padding: 5px 11px; font-size: 12px; border-radius: 6px; }
+    .btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 5px; }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 2px 8px; border-radius: 20px;
+      font-size: 10px; font-weight: 600;
+    }
+    .badge-blue { background: rgba(59,130,246,0.2); color: #93c5fd; }
+    .badge-green { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+    .badge-red { background: rgba(239,68,68,0.2); color: #fca5a5; }
+    .badge-gold { background: rgba(245,158,11,0.2); color: #fcd34d; }
+    .badge-purple { background: rgba(139,92,246,0.2); color: #c4b5fd; }
+    .badge-gray { background: rgba(148,163,184,0.15); color: var(--txt-muted); }
+    .badge-cyan { background: rgba(6,182,212,0.2); color: #67e8f9; }
+
+    /* TABLES */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .tbl th {
+      padding: 10px 14px; text-align: left;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--txt-muted);
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--border);
+    }
+    .tbl td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--txt);
+    }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* FORM ELEMENTS */
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--txt-muted); margin-bottom: 6px; }
+    .form-control {
+      width: 100%; padding: 9px 12px;
+      font-size: 13px; border-radius: 8px;
+    }
+    .form-control-sm { padding: 6px 10px; font-size: 12px; }
+
+    /* ═══════════════════════════════════════
+       CHATBOT STYLES (PREMIUM)
+    ═══════════════════════════════════════ */
+    .chat-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex; flex-direction: column;
+      height: 460px;
+    }
+    .chat-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-size: 13px; font-weight: 700; }
+    .chat-header-sub { font-size: 10px; color: var(--green); display: flex; align-items: center; gap: 4px; }
+    .chat-header-sub::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .msg-user { display: flex; justify-content: flex-end; }
+    .msg-ai  { display: flex; justify-content: flex-start; }
+    .msg-bubble {
+      padding: 9px 14px; border-radius: 14px;
+      font-size: 13px; max-width: 80%; line-height: 1.55;
+    }
+    .msg-user .msg-bubble {
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: white; border-radius: 14px 14px 3px 14px;
+    }
+    .msg-ai .msg-bubble {
+      background: var(--bg-el); color: var(--txt);
+      border: 1px solid var(--border);
+      border-radius: 3px 14px 14px 14px;
+    }
+    .msg-ai .msg-sender {
+      font-size: 10px; color: var(--txt-muted);
+      margin-bottom: 4px; padding-left: 2px;
+    }
+
+    .typing-indicator {
+      display: flex; gap: 4px;
+      padding: 10px 14px;
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: 3px 14px 14px 14px;
+    }
+    .typing-indicator span {
+      width: 7px; height: 7px;
+      background: var(--txt-muted); border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%,80%,100% { transform: scale(0.6); opacity: 0.3; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .chat-input-area {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input-row {
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .chat-textarea {
+      flex: 1; min-height: 40px; max-height: 100px;
+      padding: 9px 12px; font-size: 13px; resize: none;
+      border-radius: 10px;
+    }
+    .chat-send-btn {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--accent); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all var(--transition);
+      flex-shrink: 0;
+    }
+    .chat-send-btn:hover { background: #2563eb; transform: scale(1.05); }
+    .chat-send-btn:disabled { background: var(--bg-el); color: var(--txt-muted); }
+
+    /* Quick chips */
+    .chips-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .chip {
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500;
+      background: rgba(59,130,246,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(59,130,246,0.25);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .chip:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    .chip.green { background: rgba(16,185,129,0.1); color: var(--green); border-color: rgba(16,185,129,0.25); }
+    .chip.green:hover { background: var(--green); color: white; }
+
+    /* ═══════════════════════════════════════
+       ML RESULTS PANEL
+    ═══════════════════════════════════════ */
+    .ml-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .ml-empty {
+      text-align: center; padding: 40px 20px;
+      color: var(--txt-muted); font-size: 13px;
+    }
+    .ml-empty i { font-size: 36px; margin-bottom: 10px; color: var(--accent); opacity: 0.4; }
+    .ml-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .ml-box {
+      background: var(--bg-el); border-radius: 10px;
+      padding: 12px; text-align: center;
+    }
+    .ml-box-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--txt-muted); }
+    .ml-box-value { font-size: 17px; font-weight: 800; margin-top: 4px; }
+    .ml-box-conf { font-size: 10px; color: var(--txt-muted); margin-top: 2px; }
+
+    .win-ring {
+      width: 76px; height: 76px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .win-ring-inner {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--bg-el);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; position: absolute;
+    }
+
+    .steps-ol { list-style: none; padding: 0; counter-reset: step; }
+    .steps-ol li {
+      counter-increment: step;
+      padding: 6px 0 6px 32px;
+      position: relative; font-size: 12px; color: var(--txt);
+      border-bottom: 1px solid var(--border);
+    }
+    .steps-ol li:last-child { border-bottom: none; }
+    .steps-ol li::before {
+      content: counter(step);
+      position: absolute; left: 0; top: 5px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--accent); color: white;
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .law-tag {
+      display: inline-block;
+      padding: 3px 8px; margin: 2px;
+      background: rgba(59,130,246,0.1);
+      color: #93c5fd;
+      border: 1px solid rgba(59,130,246,0.25);
+      border-radius: 5px; font-size: 10px;
+    }
+
+    /* CASE CARDS (client) */
+    .case-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 14px 16px; margin-bottom: 10px;
+      transition: all var(--transition);
+    }
+    .case-card:hover { border-color: rgba(255,255,255,0.12); box-shadow: var(--shadow); transform: translateY(-1px); }
+    .case-card.risk-high { border-left-color: var(--red); }
+    .case-card.risk-medium { border-left-color: var(--gold); }
+    .case-card.risk-low { border-left-color: var(--green); }
+    .case-title { font-size: 14px; font-weight: 700; color: var(--txt); }
+    .case-desc { font-size: 12px; color: var(--txt-muted); margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .case-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: center; }
+
+    /* NOTE CARDS */
+    .note-card {
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 8px; padding: 12px 14px; margin-bottom: 8px;
+    }
+    .note-meta { font-size: 10px; color: var(--txt-muted); margin-bottom: 6px; }
+    .note-text { font-size: 13px; color: var(--txt); line-height: 1.5; }
+
+    /* QUEUE LAYOUT (lawyer) */
+    .queue-layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; min-height: 70vh; }
+    .queue-list {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .queue-filter { padding: 10px; border-bottom: 1px solid var(--border); }
+    .queue-filter select { width: 100%; padding: 7px; font-size: 12px; }
+    .queue-items { flex: 1; overflow-y: auto; }
+    .queue-item {
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background var(--transition);
+    }
+    .queue-item:hover { background: var(--bg-el); }
+    .queue-item.selected { background: rgba(59,130,246,0.1); border-left: 3px solid var(--accent); }
+    .qi-title { font-size: 13px; font-weight: 600; color: var(--txt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .qi-meta { font-size: 11px; color: var(--txt-muted); margin-top: 3px; }
+
+    .case-detail-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+    }
+
+    /* INTENT CARDS */
+    .intent-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 13px 15px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .intent-toggle { flex-shrink: 0; }
+    .intent-body { flex: 1; min-width: 0; }
+    .intent-trigger { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .intent-preview { font-size: 11px; color: var(--txt-muted); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .intent-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+    /* TOGGLE SWITCH */
+    .toggle-sw { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .toggle-sw input { opacity: 0; width: 0; height: 0; }
+    .toggle-sl {
+      position: absolute; cursor: pointer; inset: 0;
+      background: var(--bg-el); border-radius: 20px;
+      transition: var(--transition);
+    }
+    .toggle-sl:before {
+      content: ''; position: absolute;
+      width: 14px; height: 14px; left: 3px; top: 3px;
+      background: white; border-radius: 50%;
+      transition: var(--transition);
+    }
+    input:checked + .toggle-sl { background: var(--green); }
+    input:checked + .toggle-sl:before { transform: translateX(16px); }
+
+    /* LOG ITEMS */
+    .log-item {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 11px 14px; margin-bottom: 6px;
+    }
+    .log-meta { font-size: 10px; color: var(--txt-muted); margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .log-q { font-size: 12px; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
+    .log-r { font-size: 11px; color: var(--txt-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* BAR CHART */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .bar-label { width: 110px; font-size: 11px; color: var(--txt-muted); flex-shrink: 0; text-transform: capitalize; }
+    .bar-track { flex: 1; height: 12px; background: var(--bg-el); border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--purple)); transition: width 0.8s ease; }
+    .bar-count { width: 30px; font-size: 11px; color: var(--txt-muted); text-align: right; flex-shrink: 0; }
+
+    /* ALERT BOX */
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-top: 8px; }
+    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: var(--green); }
+    .alert-danger  { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+    .alert-info    { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); color: #93c5fd; }
+    .alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: var(--gold); }
+
+    /* ACTIVITY FEED */
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-text { font-size: 12px; color: var(--txt); }
+    .activity-meta { font-size: 10px; color: var(--txt-muted); margin-top: 2px; }
+
+    /* SETTINGS ROW */
+    .settings-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-label { font-size: 13px; font-weight: 600; }
+    .settings-desc { font-size: 11px; color: var(--txt-muted); margin-top: 2px; }
+
+    /* MODAL */
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 500; display: none;
+      align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 24px;
+      width: 90%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .modal-header h4 { font-size: 16px; font-weight: 700; }
+    .modal-close { background: none; color: var(--txt-muted); font-size: 18px; padding: 4px; }
+    .modal-close:hover { color: var(--red); }
+
+    /* CHATBOT STEP INDICATOR */
+    .step-indicator {
+      display: flex; align-items: center; gap: 4px;
+      padding: 8px 12px; background: rgba(59,130,246,0.08);
+      border-radius: 8px; margin-bottom: 10px;
+      font-size: 11px; color: var(--accent);
+      border: 1px solid rgba(59,130,246,0.2);
+    }
+    .step-indicator i { margin-right: 4px; }
+
+    /* UTILITY */
+    .text-muted { color: var(--txt-muted); }
+    .text-blue { color: var(--accent); }
+    .text-gold { color: var(--gold); }
+    .text-green { color: var(--green); }
+    .text-red { color: var(--red); }
+    .text-purple { color: var(--purple); }
+    .text-center { text-align: center; }
+    .fw-bold { font-weight: 700; }
+    .fw-600 { font-weight: 600; }
+    .d-flex { display: flex; }
+    .align-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12{ margin-top: 12px; }
+    .mt-16{ margin-top: 16px; }
+    .mb-16{ margin-bottom: 16px; }
+    .mb-8 { margin-bottom: 8px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .row-chat { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+    .empty-state { text-align: center; padding: 50px 20px; }
+    .empty-state i { font-size: 40px; color: var(--txt-muted); opacity: 0.3; display: block; margin-bottom: 12px; }
+    .empty-state p { color: var(--txt-muted); font-size: 13px; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sb-brand">
+    <div class="brand-logo">⚖️ LexAI</div>
+    <small>Indian Legal Intelligence Platform</small>
+  </div>
+
+  <div class="sb-user">
+    {% if role == 'admin' %}
+      <div class="sb-avatar" style="background:rgba(245,158,11,0.2); color:#f59e0b;">🛡️</div>
+    {% elif role == 'lawyer' %}
+      <div class="sb-avatar" style="background:rgba(16,185,129,0.2); color:#10b981;">⚖️</div>
+    {% elif role == 'chatbot_manager' %}
+      <div class="sb-avatar" style="background:rgba(139,92,246,0.2); color:#8b5cf6;">🤖</div>
+    {% else %}
+      <div class="sb-avatar" style="background:rgba(59,130,246,0.2); color:#3b82f6;">👤</div>
+    {% endif %}
+    <div class="sb-user-info">
+      <div class="sb-username">{{ username }}</div>
+      {% if role == 'client' %}
+        <span class="sb-role" style="background:rgba(59,130,246,0.15); color:#93c5fd;">Client</span>
+      {% elif role == 'lawyer' %}
+        <span class="sb-role" style="background:rgba(16,185,129,0.15); color:#6ee7b7;">Lawyer</span>
+      {% elif role == 'admin' %}
+        <span class="sb-role" style="background:rgba(245,158,11,0.15); color:#fcd34d;">Admin</span>
+      {% elif role == 'chatbot_manager' %}
+        <span class="sb-role" style="background:rgba(139,92,246,0.15); color:#c4b5fd;">Bot Manager</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="sb-nav">
+
+    <!-- ALL ROLES -->
+    <div class="sb-section">Main</div>
+    <a class="sb-link active" id="nav-home" onclick="showPanel('home')">
+      <i class="fa fa-home"></i> Dashboard
+    </a>
+
+    <!-- CLIENT -->
+    {% if role == 'client' %}
+    <div class="sb-section">My Legal Matters</div>
+    <a class="sb-link" id="nav-mycases" onclick="showPanel('mycases')">
+      <i class="fa fa-folder-open"></i> My Cases
+    </a>
+    <a class="sb-link" id="nav-appointments" onclick="showPanel('appointments')">
+      <i class="fa fa-calendar-check"></i> My Appointments
+    </a>
+    {% endif %}
+
+    <!-- LAWYER -->
+    {% if role == 'lawyer' %}
+    <div class="sb-section">Lawyer Tools</div>
+    <a class="sb-link" id="nav-queue" onclick="showPanel('queue')">
+      <i class="fa fa-inbox"></i> Case Queue
+    </a>
+    <a class="sb-link" id="nav-lappts" onclick="showPanel('lappts')">
+      <i class="fa fa-calendar-alt"></i> Appointment Requests
+    </a>
+    <a class="sb-link" id="nav-mynotes" onclick="showPanel('mynotes')">
+      <i class="fa fa-sticky-note"></i> My Notes
+    </a>
+    {% endif %}
+
+    <!-- ADMIN -->
+    {% if role == 'admin' %}
+    <div class="sb-section">Admin Panel</div>
+    <a class="sb-link" id="nav-users" onclick="showPanel('users')">
+      <i class="fa fa-users"></i> User Management
+    </a>
+    <a class="sb-link" id="nav-allcases" onclick="showPanel('allcases')">
+      <i class="fa fa-briefcase"></i> All Cases
+    </a>
+    <a class="sb-link" id="nav-adminlogs" onclick="showPanel('adminlogs')">
+      <i class="fa fa-history"></i> Chatbot Logs
+    </a>
+    <a class="sb-link" id="nav-settings" onclick="showPanel('settings')">
+      <i class="fa fa-cog"></i> System Settings
+    </a>
+    {% endif %}
+
+    <!-- CHATBOT MANAGER -->
+    {% if role == 'chatbot_manager' %}
+    <div class="sb-section">Bot Control</div>
+    <a class="sb-link" id="nav-intents" onclick="showPanel('intents')">
+      <i class="fa fa-brain"></i> Intent Manager
+    </a>
+    <a class="sb-link" id="nav-logs" onclick="showPanel('logs')">
+      <i class="fa fa-comment-dots"></i> Conversation Logs
+    </a>
+    <a class="sb-link" id="nav-analytics" onclick="showPanel('analytics')">
+      <i class="fa fa-chart-bar"></i> Analytics
+    </a>
+    <a class="sb-link" id="nav-cbmconfig" onclick="showPanel('cbmconfig')">
+      <i class="fa fa-sliders-h"></i> Bot Config
+    </a>
+    {% endif %}
+
+    <!-- ALL ROLES -->
+    <div class="sb-section">Account</div>
+    <a class="sb-link" id="nav-profile" onclick="showPanel('profile')">
+      <i class="fa fa-user-circle"></i> My Profile
+    </a>
+  </div>
+
+  <div class="sb-footer">
+    <a href="/logout" class="logout-btn"><i class="fa fa-sign-out-alt"></i> Sign Out</a>
+    <div class="sb-credits">Made by <strong>Gaurav Govind Nikam</strong><br>MCA 2026 · LexAI Platform</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════ -->
+<div id="main">
+  <header id="topbar">
+    <span id="pageTitle"><i class="fa fa-circle" style="color:var(--accent);font-size:8px;margin-right:8px;"></i>Dashboard</span>
+    <div class="topbar-right">
+      <span class="topbar-time" id="liveTime"></span>
+      <span class="online-dot">Online</span>
+      <span style="color:var(--txt-muted);">|</span>
+      <span style="color:var(--txt);">{{ username }}</span>
+
+      <!-- Notifications Bell -->
+      <div style="position:relative;">
+        <button id="notifBtn" title="Notifications"
+          style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 9px;color:var(--txt-muted);cursor:pointer;transition:all 0.2s;position:relative;"
+          onmouseenter="this.style.color='var(--txt)'" onmouseleave="this.style.color='var(--txt-muted)'"
+          onclick="toggleNotifs()">
+          <i class="fa fa-bell" style="font-size:13px;"></i>
+          <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--red);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;align-items:center;justify-content:center;font-weight:700;"></span>
+        </button>
+        <div id="notifDropdown" style="display:none;position:absolute;right:0;top:calc(100% + 10px);background:var(--bg-card);border:1px solid var(--border);border-radius:14px;min-width:310px;z-index:400;box-shadow:0 12px 40px rgba(0,0,0,0.4);overflow:hidden;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:13px;font-weight:700;">🔔 Notifications</span>
+            <button onclick="toggleNotifs()" style="background:none;color:var(--txt-muted);font-size:15px;border:none;cursor:pointer;">✕</button>
+          </div>
+          <div id="notifList" style="max-height:340px;overflow-y:auto;padding:6px 0;">
+            <div style="text-align:center;padding:20px;color:var(--txt-muted);font-size:12px;"><i class="fa fa-spinner fa-spin"></i> Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark / Light Theme Toggle -->
+      <button id="themeBtn" title="Toggle Dark / Light Mode"
+        style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;color:var(--txt-muted);font-size:13px;transition:all 0.2s;"
+        onmouseenter="this.style.color='var(--gold)'" onmouseleave="this.style.color='var(--txt-muted)'"
+        onclick="toggleTheme()">
+        <i id="themeIcon" class="fa fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+
+  <div class="content" id="panelArea">
+
+<!-- ════════════════════════════════════════════════════════════════
+     HOME PANELS — per role (all have stats + chatbot)
+════════════════════════════════════════════════════════════════ -->
+
+<!-- ── CLIENT HOME ── -->
+{% if role == 'client' %}
+<div class="panel active" id="panel-home">
+  <!-- Stats -->
+  <div class="stats-grid stats-grid-4 mb-16" id="clientStatsGrid">
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><i class="fa fa-folder"></i></div>
+      <div class="stat-number" id="cs-total">—</div>
+      <div class="stat-label">Total Cases</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-icon gold"><i class="fa fa-clock"></i></div>
+      <div class="stat-number" id="cs-pending">—</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon green"><i class="fa fa-check-circle"></i></div>
+      <div class="stat-number" id="cs-reviewed">—</div>
+      <div class="stat-label">Reviewed</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon purple"><i class="fa fa-calendar-check"></i></div>
+      <div class="stat-number" id="cs-appts">—</div>
+      <div class="stat-label">Appointments</div>
+    </div>
+  </div>
+
+  <!-- Chat + ML Row -->
+  <div class="row-chat">
+    <!-- LEFT: Chatbot -->
+    <div>
+      <div class="sec-head">
+        <h3><i class="fa fa-robot" style="color:var(--accent)"></i> AI Legal Advisor <span style="font-weight:400;font-size:11px;background:rgba(59,130,246,0.1);padding:2px 8px;border-radius:20px;">Command Center</span></h3>
+      </div>
+      <!-- Quick chips -->
+      <div class="chips-row" id="clientChips">
+        <span class="chip" onclick="clientCmd('submit case')">📁 Submit New Case</span>
+        <span class="chip" onclick="clientCmd('book appointment')">📅 Book Appointment</span>
+        <span class="chip" onclick="clientCmd('my cases')">🗂️ My Cases</span>
+        <span class="chip" onclick="clientCmd('cancel appointment')">❌ Cancel Appointment</span>
+        <span class="chip" onclick="clientCmd('help')">❓ Help</span>
+        <span class="chip green" onclick="clientCmd('498A dowry case mein kya karna chahiye?')">498A / Dowry</span>
+        <span class="chip green" onclick="clientCmd('Cheque bounce ho gaya kya karein?')">Cheque Bounce</span>
+        <span class="chip green" onclick="clientCmd('Online UPI fraud ho gaya help karo')">Cyber Fraud</span>
+        <span class="chip green" onclick="clientCmd('bail kaise milti hai')">Bail</span>
+      </div>
+      <div id="clientStateBar" class="step-indicator" style="display:none;">
+        <i class="fa fa-info-circle"></i> <span id="clientStateText">Step in progress…</span>
+      </div>
+      <div class="chat-container" id="clientChat">
+        <div class="chat-header">
+          <div class="chat-avatar">⚖️</div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">Adv. LexAI — Senior AI Advocate</div>
+            <div class="chat-header-sub">Trained on Indian Law · IPC/BNS 2023 · 35+ areas</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="clientChatMsgs">
+          <div class="msg-ai">
+            <div class="msg-sender">Adv. LexAI</div>
+            <div class="msg-bubble">
+              👋 <strong>Namaskar!</strong> Main hoon <strong>Adv. LexAI</strong> — aapka AI Senior Legal Advisor.<br><br>
+              🔹 <strong>Case submit karna ho</strong> — type karo <em>"submit case"</em><br>
+              🔹 <strong>Appointment book karna ho</strong> — type karo <em>"book appointment"</em><br>
+              🔹 <strong>Legal sawaal poochhna ho</strong> — seedha likh do!<br><br>
+              <em>Examples:</em><br>
+              • "<em>Ghar par chori hui hai</em>" — theft guidance<br>
+              • "<em>Mere saath online fraud hua</em>" — cyber crime steps<br>
+              • "<em>Boss ne salary nahi di</em>" — labour law rights<br><br>
+              Batao kya hua? 🙏
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea class="chat-textarea form-control" id="clientChatInput" rows="1"
+              placeholder="Apni legal problem likho ya command dalo (e.g. 'submit case')…"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();clientSend();}"></textarea>
+            <button class="chat-send-btn" id="clientSendBtn" onclick="clientSend()"><i class="fa fa-paper-plane"></i></button>
+          </div>
+          <small class="text-muted" style="font-size:10px; display:block; margin-top:5px;">Enter = send · Shift+Enter = new line</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ML Results -->
+    <div>
+      <div class="sec-head">
+        <h3><i class="fa fa-brain" style="color:var(--purple)"></i> ML Case Analysis</h3>
+      </div>
+      <div class="ml-panel" id="clientMlPanel">
+        <div class="ml-empty" id="clientMlEmpty">
+          <i class="fa fa-robot"></i>
+          <p>Ask a legal question or submit a case<br>to see AI analysis here.</p>
+        </div>
+        <div id="clientMlResults" style="display:none;">
+          <div class="ml-grid">
+            <div class="ml-box">
+              <div class="ml-box-label">Case Category</div>
+              <div class="ml-box-value text-blue" id="cml-cat">—</div>
+              <div class="ml-box-conf" id="cml-catconf"></div>
+            </div>
+            <div class="ml-box">
+              <div class="ml-box-label">Risk Level</div>
+              <div class="ml-box-value" id="cml-risk">—</div>
+              <div class="ml-box-conf" id="cml-riskconf"></div>
+            </div>
+          </div>
+          <div class="ml-box mb-8" style="display:flex;align-items:center;gap:14px;text-align:left;">
+            <div class="win-ring" id="cml-ring">
+              <div class="win-ring-inner" id="cml-prob">0%</div>
+            </div>
+            <div style="flex:1;font-size:12px;" id="cml-advice"></div>
+          </div>
+          <div id="cml-stepsbox" style="display:none;" class="mb-8">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-muted);margin-bottom:8px;">Recommended Steps</div>
+            <ol class="steps-ol" id="cml-steps"></ol>
+          </div>
+          <div id="cml-lawsbox" style="display:none;" class="mb-8">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-muted);margin-bottom:6px;">Applicable Laws</div>
+            <div id="cml-laws"></div>
+          </div>
+          <div id="cml-simbox" style="display:none;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-muted);margin-bottom:6px;">Similar Past Cases</div>
+            <div id="cml-sims"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Legal fact ticker -->
+      <div class="card mt-8" style="font-size:12px; padding:12px;">
+        <strong style="color:var(--gold);">💡 Did You Know?</strong>
+        <div id="legalFact" style="color:var(--txt-muted);margin-top:6px;line-height:1.6;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── LAWYER HOME ── -->
+{% if role == 'lawyer' %}
+<div class="panel active" id="panel-home">
+  <div class="stats-grid stats-grid-5 mb-16">
+    <div class="stat-card blue">
+      <div class="stat-icon blue"><i class="fa fa-briefcase"></i></div>
+      <div class="stat-number" id="ls-total">—</div>
+      <div class="stat-label">Total Cases</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-icon gold"><i class="fa fa-hourglass-half"></i></div>
+      <div class="stat-number" id="ls-pending">—</div>
+      <div class="stat-label">Pending Cases</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon green"><i class="fa fa-check-double"></i></div>
+      <div class="stat-number" id="ls-reviewed">—</div>
+      <div class="stat-label">Reviewed</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-icon cyan"><i class="fa fa-calendar-plus"></i></div>
+      <div class="stat-number" id="ls-appts">—</div>
+      <div class="stat-label">Appt. Requests</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-icon purple"><i class="fa fa-sticky-note"></i></div>
+      <div class="stat-number" id="ls-notes">—</div>
+      <div class="stat-label">My Notes</div>
+    </div>
+  </div>
+  <div class="row-chat">
+    <div>
+      <div class="sec-head"><h3><i class="fa fa-robot" style="color:var(--accent)"></i> AI Legal Advisor</h3></div>
+      <div class="chips-row">
+        <span class="chip" onclick="lawyerSend('show pending cases')">📋 Pending Cases</span>
+        <span class="chip" onclick="lawyerSend('appointment requests')">📅 Appointments</span>
+        <span class="chip green" onclick="lawyerSend('property law latest updates')">Property Law</span>
+        <span class="chip green" onclick="lawyerSend('criminal procedure bail law')">Criminal Law</span>
+        <span class="chip green" onclick="lawyerSend('labour law India termination rights')">Labour Law</span>
+        <span class="chip green" onclick="lawyerSend('RERA 2016 key provisions')">RERA</span>
+      </div>
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar">⚖️</div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">Adv. LexAI — Legal Research Assistant</div>
+            <div class="chat-header-sub">Indian Law Database · IPC/BNS · CrPC/BNSS 2023</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="lawyerChatMsgs">
+          <div class="msg-ai">
+            <div class="msg-sender">Adv. LexAI</div>
+            <div class="msg-bubble">
+              👋 Welcome, Counsellor!<br><br>
+              I can help with legal research, case strategy, applicable laws, and precedents.<br><br>
+              🔹 Type any legal query or IPC section for detailed guidance.<br>
+              🔹 Ask about pending cases: <em>"show pending cases"</em><br>
+              🔹 Research any topic in Indian law.<br><br>
+              How can I assist today? ⚖️
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea class="chat-textarea form-control" id="lawyerChatInput" rows="1"
+              placeholder="Legal research query or case question…"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();lawyerSend();}"></textarea>
+            <button class="chat-send-btn" id="lawyerSendBtn" onclick="lawyerSend()"><i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-head"><h3><i class="fa fa-brain" style="color:var(--purple)"></i> ML Analysis</h3></div>
+      <div class="ml-panel">
+        <div class="ml-empty" id="lawyerMlEmpty"><i class="fa fa-robot"></i><p>Query to see ML analysis here.</p></div>
+        <div id="lawyerMlResults" style="display:none;">
+          <div class="ml-grid">
+            <div class="ml-box"><div class="ml-box-label">Category</div><div class="ml-box-value text-blue" id="lml-cat">—</div><div class="ml-box-conf" id="lml-catconf"></div></div>
+            <div class="ml-box"><div class="ml-box-label">Risk Level</div><div class="ml-box-value" id="lml-risk">—</div><div class="ml-box-conf" id="lml-riskconf"></div></div>
+          </div>
+          <div class="ml-box mb-8" style="display:flex;align-items:center;gap:14px;text-align:left;">
+            <div class="win-ring" id="lml-ring"><div class="win-ring-inner" id="lml-prob">0%</div></div>
+            <div style="flex:1;font-size:12px;" id="lml-advice"></div>
+          </div>
+          <div id="lml-stepsbox" style="display:none;" class="mb-8">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--txt-muted);margin-bottom:8px;">Recommended Steps</div>
+            <ol class="steps-ol" id="lml-steps"></ol>
+          </div>
+          <div id="lml-lawsbox" style="display:none;">
+            <div style="font-size:10px;text-transform:uppercase;color:var(--txt-muted);margin-bottom:6px;">Applicable Laws</div>
+            <div id="lml-laws"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── ADMIN HOME ── -->
+{% if role == 'admin' %}
+<div class="panel active" id="panel-home">
+  <div class="d-flex align-center justify-between mb-16">
+    <div>
+      <h2 style="font-size:20px;font-weight:800;">Platform Overview</h2>
+      <p class="text-muted" style="font-size:12px;margin-top:4px;">Live administrative intelligence dashboard</p>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="loadAdminHome()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div class="stats-grid stats-grid-4 mb-16">
+    <div class="stat-card blue"><div class="stat-icon blue"><i class="fa fa-users"></i></div><div class="stat-number" id="as-users">—</div><div class="stat-label">Total Users</div></div>
+    <div class="stat-card gold"><div class="stat-icon gold"><i class="fa fa-folder-open"></i></div><div class="stat-number" id="as-cases">—</div><div class="stat-label">Total Cases</div></div>
+    <div class="stat-card red"><div class="stat-icon red"><i class="fa fa-exclamation-triangle"></i></div><div class="stat-number" id="as-pending">—</div><div class="stat-label">Pending Cases</div></div>
+    <div class="stat-card green"><div class="stat-icon green"><i class="fa fa-comments"></i></div><div class="stat-number" id="as-chats">—</div><div class="stat-label">AI Queries</div></div>
+  </div>
+  <div class="stats-grid stats-grid-4 mb-16">
+    <div class="stat-card blue"><div class="stat-icon blue"><i class="fa fa-user"></i></div><div class="stat-number" id="as-clients">—</div><div class="stat-label">Clients</div></div>
+    <div class="stat-card green"><div class="stat-icon green"><i class="fa fa-gavel"></i></div><div class="stat-number" id="as-lawyers">—</div><div class="stat-label">Lawyers</div></div>
+    <div class="stat-card gold"><div class="stat-icon gold"><i class="fa fa-shield-alt"></i></div><div class="stat-number" id="as-admins">—</div><div class="stat-label">Admins</div></div>
+    <div class="stat-card purple"><div class="stat-icon purple"><i class="fa fa-robot"></i></div><div class="stat-number" id="as-cbms">—</div><div class="stat-label">Bot Managers</div></div>
+  </div>
+  <div class="row2">
+    <!-- Activity Feed -->
+    <div class="card">
+      <div class="sec-head"><h3><i class="fa fa-stream" style="color:var(--accent)"></i> Recent Activity</h3><button class="btn btn-ghost btn-xs" onclick="loadActivity()"><i class="fa fa-sync-alt"></i></button></div>
+      <div id="activityFeed"><div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading…</p></div></div>
+    </div>
+    <!-- Admin chatbot -->
+    <div>
+      <div class="sec-head"><h3><i class="fa fa-terminal" style="color:var(--gold)"></i> Admin AI Console</h3></div>
+      <div class="chat-container" style="height:360px;">
+        <div class="chat-header">
+          <div class="chat-avatar" style="background:linear-gradient(135deg,var(--gold),var(--red));">🛡️</div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">LexAI Admin Console</div>
+            <div class="chat-header-sub">Full platform intelligence access</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="adminChatMsgs">
+          <div class="msg-ai">
+            <div class="msg-sender">LexAI Admin</div>
+            <div class="msg-bubble">🛡️ <strong>Admin Console Active</strong><br><br>You have full platform intelligence access. Ask about any legal topic, query platform stats, or get legal research assistance.</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <textarea class="chat-textarea form-control" id="adminChatInput" rows="1"
+              placeholder="Legal research or admin query…"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSend();}"></textarea>
+            <button class="chat-send-btn" onclick="adminSend()"><i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── CHATBOT MANAGER HOME ── -->
+{% if role == 'chatbot_manager' %}
+<div class="panel active" id="panel-home">
+  <div class="stats-grid stats-grid-5 mb-16">
+    <div class="stat-card blue"><div class="stat-icon blue"><i class="fa fa-comment-alt"></i></div><div class="stat-number" id="cbm-total">—</div><div class="stat-label">Total Queries</div></div>
+    <div class="stat-card purple"><div class="stat-icon purple"><i class="fa fa-robot"></i></div><div class="stat-number" id="cbm-ai">—</div><div class="stat-label">AI Responses</div></div>
+    <div class="stat-card green"><div class="stat-icon green"><i class="fa fa-list-ul"></i></div><div class="stat-number" id="cbm-rule">—</div><div class="stat-label">Rule-Based</div></div>
+    <div class="stat-card gold"><div class="stat-icon gold"><i class="fa fa-calendar-week"></i></div><div class="stat-number" id="cbm-7d">—</div><div class="stat-label">Last 7 Days</div></div>
+    <div class="stat-card cyan"><div class="stat-icon cyan"><i class="fa fa-bolt"></i></div><div class="stat-number" id="cbm-intents-home">—</div><div class="stat-label">Active Intents</div></div>
+  </div>
+  <div class="row-chat">
+    <div>
+      <div class="sec-head"><h3><i class="fa fa-flask" style="color:var(--purple)"></i> Test Chatbot (Live Simulation)</h3></div>
+      <div class="chips-row">
+        <span class="chip" onclick="cbmTestSend('cheque bounce')">Cheque Bounce</span>
+        <span class="chip" onclick="cbmTestSend('bail kaise milti hai')">Bail</span>
+        <span class="chip" onclick="cbmTestSend('online UPI fraud help')">UPI Fraud</span>
+        <span class="chip" onclick="cbmTestSend('domestic violence 498a')">498A</span>
+        <span class="chip" onclick="cbmTestSend('wrongful termination from job')">Labour Rights</span>
+        <span class="chip" onclick="cbmTestSend('property encroachment kya karein')">Property</span>
+        <span class="chip" onclick="cbmTestSend('consumer complaint online')">Consumer</span>
+        <span class="chip" onclick="cbmTestSend('RERA complaint builder fraud')">RERA</span>
+      </div>
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="chat-avatar" style="background:linear-gradient(135deg,var(--purple),var(--cyan));">🧪</div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">Test Mode — Simulated User Session</div>
+            <div class="chat-header-sub">All queries logged for analysis</div>
+          </div>
+        </div>
+        <div class="chat-messages" id="cbmTestMsgs">
+          <div class="msg-ai">
+            <div class="msg-sender">LexAI [Test Mode]</div>
+            <div class="msg-bubble">🧪 <strong>Testing Mode Active.</strong> Type any query to test the complete chatbot pipeline — rule-based intent matching → ML analysis → Mistral AI fallback.<br><br>All test queries are logged and visible in Conversation Logs.</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-row">
+            <input type="text" class="form-control form-control-sm" id="cbmTestInput"
+              placeholder="Type test query…"
+              onkeydown="if(event.key==='Enter')cbmTestSend();"
+              style="flex:1;padding:9px 12px;">
+            <button class="chat-send-btn" onclick="cbmTestSend()"><i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-head"><h3><i class="fa fa-chart-pie" style="color:var(--gold)"></i> Quick Analytics</h3></div>
+      <div class="card" style="padding:16px;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-muted);margin-bottom:12px;">Top Query Categories</div>
+        <div id="homeBarChart"><div class="text-muted text-center" style="font-size:12px;padding:20px;">Loading…</div></div>
+      </div>
+      <div class="card mt-8" style="padding:16px;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--txt-muted);margin-bottom:10px;">Last Test Result</div>
+        <div id="cbmTestInfo" style="font-size:13px;color:var(--txt-muted);">Run a test query above.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════
+     CLIENT PANELS
+════════════════════════════════════════════════════════════════ -->
+{% if role == 'client' %}
+
+<!-- MY CASES -->
+<div class="panel" id="panel-mycases">
+  <div class="sec-head">
+    <h3><i class="fa fa-folder-open" style="color:var(--gold)"></i> My Cases</h3>
+    <button class="btn btn-primary btn-sm" onclick="clientCmd('submit case')">+ Submit Case via Chat</button>
+  </div>
+  <div class="stats-grid stats-grid-4 mb-16">
+    <div class="stat-card blue"><div class="stat-icon blue"><i class="fa fa-folder"></i></div><div class="stat-number" id="mc-total">—</div><div class="stat-label">Total</div></div>
+    <div class="stat-card gold"><div class="stat-icon gold"><i class="fa fa-clock"></i></div><div class="stat-number" id="mc-pending">—</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card green"><div class="stat-icon green"><i class="fa fa-check"></i></div><div class="stat-number" id="mc-reviewed">—</div><div class="stat-label">Reviewed</div></div>
+    <div class="stat-card gray"><div class="stat-icon" style="background:rgba(148,163,184,0.1);color:var(--txt-muted);width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;"><i class="fa fa-archive"></i></div><div class="stat-number" id="mc-closed">—</div><div class="stat-label">Closed</div></div>
+  </div>
+  <div id="myCasesList">
+    <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading cases…</p></div>
+  </div>
+</div>
+
+<!-- MY APPOINTMENTS -->
+<div class="panel" id="panel-appointments">
+  <div class="sec-head">
+    <h3><i class="fa fa-calendar-check" style="color:var(--cyan)"></i> My Appointments</h3>
+    <button class="btn btn-primary btn-sm" onclick="switchToHomeAndCmd('book appointment')">+ Book via Chat</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl" id="clientApptTable">
+      <thead>
+        <tr><th>#</th><th>Category</th><th>Note</th><th>Status</th><th>Requested</th><th>Action</th></tr>
+      </thead>
+      <tbody id="clientApptBody">
+        <tr><td colspan="6" class="text-center text-muted" style="padding:30px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════
+     LAWYER PANELS
+════════════════════════════════════════════════════════════════ -->
+{% if role == 'lawyer' %}
+
+<!-- CASE QUEUE -->
+<div class="panel" id="panel-queue">
+  <div class="sec-head">
+    <h3><i class="fa fa-inbox" style="color:var(--gold)"></i> Case Queue</h3>
+    <div class="d-flex gap-8">
+      <span class="badge badge-gold" id="qBadgePending">— Pending</span>
+      <span class="badge badge-green" id="qBadgeReviewed">— Reviewed</span>
+    </div>
+  </div>
+  <div class="queue-layout">
+    <div class="queue-list">
+      <div class="queue-filter">
+        <select class="form-control form-control-sm" id="qFilter" onchange="filterQueue()">
+          <option value="all">All Cases</option>
+          <option value="pending">Pending Only</option>
+          <option value="reviewed">Reviewed</option>
+        </select>
+        <input type="text" class="form-control form-control-sm mt-8" id="qSearch" placeholder="Search cases…" oninput="filterQueue()">
+      </div>
+      <div class="queue-items" id="lawyerQueueList">
+        <div class="text-center text-muted" style="padding:30px;font-size:13px;">Loading…</div>
+      </div>
+    </div>
+    <div class="case-detail-box" id="lawyerCaseDetail">
+      <div class="empty-state">
+        <i class="fa fa-hand-point-left"></i>
+        <p>Select a case from the queue to view details and add notes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APPOINTMENT REQUESTS -->
+<div class="panel" id="panel-lappts">
+  <div class="sec-head">
+    <h3><i class="fa fa-calendar-alt" style="color:var(--cyan)"></i> Client Appointment Requests</h3>
+    <button class="btn btn-ghost btn-sm" onclick="loadLawyerAppts()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Client</th><th>Category</th><th>Note</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody id="lawyerApptBody">
+        <tr><td colspan="7" class="text-center text-muted" style="padding:30px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MY NOTES -->
+<div class="panel" id="panel-mynotes">
+  <div class="sec-head">
+    <h3><i class="fa fa-sticky-note" style="color:var(--gold)"></i> My Notes</h3>
+    <button class="btn btn-ghost btn-sm" onclick="loadMyNotes()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div id="myNotesList">
+    <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading notes…</p></div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════
+     ADMIN PANELS
+════════════════════════════════════════════════════════════════ -->
+{% if role == 'admin' %}
+
+<!-- USER MANAGEMENT -->
+<div class="panel" id="panel-users">
+  <div class="sec-head">
+    <h3><i class="fa fa-users" style="color:var(--accent)"></i> User Management</h3>
+    <button class="btn btn-primary btn-sm" onclick="openModal('createUserModal')"><i class="fa fa-plus"></i> Create User</button>
+  </div>
+  <div class="mb-8 d-flex gap-8">
+    <input type="text" class="form-control form-control-sm" id="userSearch" placeholder="Search users…" oninput="filterUsers()" style="max-width:240px;">
+    <select class="form-control form-control-sm" id="userRoleFilter" onchange="filterUsers()" style="max-width:160px;">
+      <option value="">All Roles</option>
+      <option value="client">Client</option>
+      <option value="lawyer">Lawyer</option>
+      <option value="admin">Admin</option>
+      <option value="chatbot_manager">Bot Manager</option>
+    </select>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl" id="usersTable">
+      <thead><tr><th>#</th><th>Username</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+      <tbody id="adminUsersBody">
+        <tr><td colspan="5" class="text-center text-muted" style="padding:30px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ALL CASES -->
+<div class="panel" id="panel-allcases">
+  <div class="sec-head">
+    <h3><i class="fa fa-briefcase" style="color:var(--gold)"></i> All Cases</h3>
+    <div class="d-flex gap-8">
+      <input type="text" class="form-control form-control-sm" id="acSearch" placeholder="Search…" oninput="filterAllCases()" style="max-width:200px;">
+      <select class="form-control form-control-sm" id="acFilter" onchange="filterAllCases()" style="max-width:160px;">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="reviewed">Reviewed</option>
+        <option value="closed">Closed</option>
+      </select>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Client</th><th>Case Title</th><th>Category</th><th>Risk</th><th>Win%</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody id="allCasesBody">
+        <tr><td colspan="8" class="text-center text-muted" style="padding:30px;">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CHATBOT LOGS -->
+<div class="panel" id="panel-adminlogs">
+  <div class="sec-head">
+    <h3><i class="fa fa-history" style="color:var(--purple)"></i> Chatbot Conversation Logs</h3>
+    <button class="btn btn-ghost btn-sm" onclick="loadAdminLogs()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div id="adminLogsContainer">
+    <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading…</p></div>
+  </div>
+</div>
+
+<!-- SYSTEM SETTINGS -->
+<div class="panel" id="panel-settings">
+  <div class="sec-head">
+    <h3><i class="fa fa-cog" style="color:var(--gold)"></i> System Settings</h3>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;">⚙️ Platform Configuration</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Chatbot Status</div>
+          <div class="settings-desc">Enable or disable AI chatbot for all users</div>
+        </div>
+        <label class="toggle-sw"><input type="checkbox" id="cfg-chatbot-enabled" onchange="saveCfg('chatbot_enabled', this.checked?'1':'0')"><span class="toggle-sl"></span></label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Max Cases per Client</div>
+          <div class="settings-desc">Maximum cases a client can submit</div>
+        </div>
+        <input type="number" class="form-control" id="cfg-max-cases" min="1" max="200" style="width:80px;padding:6px 8px;font-size:13px;" onchange="saveCfg('max_cases_per_client', this.value)">
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Platform Name</div>
+          <div class="settings-desc">Displayed across the platform</div>
+        </div>
+        <input type="text" class="form-control" id="cfg-platform-name" style="width:140px;padding:6px 8px;font-size:13px;" onblur="saveCfg('platform_name', this.value)">
+      </div>
+      <div id="cfg-msg" style="display:none;"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;">🤖 ML Model Status</div>
+      <div style="font-size:12px; color:var(--txt-muted); line-height:2;">
+        <div>Vectorizer: <span style="color:var(--green);">✔ Loaded</span></div>
+        <div>Category Model (RFC): <span style="color:var(--green);">✔ Loaded</span></div>
+        <div>Risk Model (RFC): <span style="color:var(--green);">✔ Loaded</span></div>
+        <div>TF-IDF Matrix (RAG): <span style="color:var(--green);">✔ Loaded</span></div>
+        <div>Mistral AI Integration: <span style="color:var(--gold);">✔ Active</span></div>
+        <div style="margin-top:12px; padding:10px; background:rgba(59,130,246,0.08); border-radius:8px; font-size:11px;">
+          Pipeline: TF-IDF → RandomForest → Cosine Similarity RAG → Mistral AI Fallback
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════
+     CHATBOT MANAGER PANELS
+════════════════════════════════════════════════════════════════ -->
+{% if role == 'chatbot_manager' %}
+
+<!-- INTENT MANAGER -->
+<div class="panel" id="panel-intents">
+  <div class="sec-head">
+    <h3><i class="fa fa-brain" style="color:var(--purple)"></i> Intent Manager <span id="intentCountBadge" class="badge badge-purple" style="font-size:10px;">0 active</span></h3>
+    <button class="btn btn-ghost btn-sm" onclick="loadIntents()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div class="row2">
+    <!-- Left: intent list -->
+    <div>
+      <div style="margin-bottom:10px;">
+        <input type="text" class="form-control form-control-sm" id="intentSearch" placeholder="Search intents…" oninput="searchIntents()">
+      </div>
+      <div id="intentListContainer">
+        <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading intents…</p></div>
+      </div>
+    </div>
+    <!-- Right: add new -->
+    <div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;">➕ Add New Intent</div>
+        <div class="form-group">
+          <label class="form-label">Trigger Keyword(s) *</label>
+          <input type="text" class="form-control" id="intentTrigger" placeholder="e.g. section 144, curfew, noise complaint">
+          <div style="font-size:10px;color:var(--txt-muted);margin-top:4px;">When user types this keyword, custom response triggers.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control" id="intentCategory">
+            <option value="general">General</option>
+            <option value="criminal">Criminal</option>
+            <option value="property">Property</option>
+            <option value="family">Family</option>
+            <option value="labour">Labour</option>
+            <option value="fraud">Fraud / Cyber</option>
+            <option value="consumer">Consumer</option>
+            <option value="motor_accident">Motor Accident</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Response Text * (HTML allowed)</label>
+          <textarea class="form-control" id="intentResponse" rows="5" placeholder="Enter response. You can use &lt;strong&gt;, &lt;br&gt;, emoji…"></textarea>
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="addIntent()">Add Intent</button>
+        <div id="intentMsg" style="display:none;" class="mt-8"></div>
+      </div>
+      <div class="card mt-8">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;">📋 Bulk Import</div>
+        <div style="font-size:11px;color:var(--txt-muted);margin-bottom:8px;">Paste intents as JSON array: [{trigger, response, category}, …]</div>
+        <textarea class="form-control" id="bulkJson" rows="4" placeholder='[{"trigger":"noise complaint","response":"File complaint under ...","category":"criminal"}]'></textarea>
+        <button class="btn btn-ghost btn-sm mt-8" onclick="bulkAddIntents()">Import JSON</button>
+        <div id="bulkMsg" style="display:none;" class="mt-8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONVERSATION LOGS -->
+<div class="panel" id="panel-logs">
+  <div class="sec-head">
+    <h3><i class="fa fa-comment-dots" style="color:var(--cyan)"></i> Conversation Logs</h3>
+    <div class="d-flex gap-8">
+      <select class="form-control form-control-sm" id="logCatFilter" onchange="loadCbmLogs()" style="max-width:150px;">
+        <option value="">All Categories</option>
+        <option value="criminal">Criminal</option>
+        <option value="property">Property</option>
+        <option value="family">Family</option>
+        <option value="labour">Labour</option>
+        <option value="fraud">Fraud</option>
+        <option value="consumer">Consumer</option>
+        <option value="motor_accident">Motor Accident</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="loadCbmLogs()"><i class="fa fa-sync-alt"></i> Refresh</button>
+    </div>
+  </div>
+  <div id="cbmLogsContainer">
+    <div class="empty-state"><i class="fa fa-spinner fa-spin"></i><p>Loading logs…</p></div>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="panel" id="panel-analytics">
+  <div class="sec-head">
+    <h3><i class="fa fa-chart-bar" style="color:var(--gold)"></i> Chatbot Analytics</h3>
+    <button class="btn btn-ghost btn-sm" onclick="loadAnalytics()"><i class="fa fa-sync-alt"></i> Refresh</button>
+  </div>
+  <div class="stats-grid stats-grid-4 mb-16">
+    <div class="stat-card blue"><div class="stat-icon blue"><i class="fa fa-comment-alt"></i></div><div class="stat-number" id="an-total">—</div><div class="stat-label">Total Queries</div></div>
+    <div class="stat-card purple"><div class="stat-icon purple"><i class="fa fa-magic"></i></div><div class="stat-number" id="an-ai">—</div><div class="stat-label">AI Responses</div></div>
+    <div class="stat-card green"><div class="stat-icon green"><i class="fa fa-list-ul"></i></div><div class="stat-number" id="an-rule">—</div><div class="stat-label">Rule-Based</div></div>
+    <div class="stat-card gold"><div class="stat-icon gold"><i class="fa fa-chart-line"></i></div><div class="stat-number" id="an-pct">—</div><div class="stat-label">AI Rate</div></div>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Top Query Categories</div>
+      <div id="analyticsBars"><div class="text-muted text-center" style="font-size:12px;">No data.</div></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Summary Table</div>
+      <table class="tbl" style="font-size:12px;">
+        <tr><td class="text-muted">Active Intents</td><td><strong id="an-intents">—</strong></td></tr>
+        <tr><td class="text-muted">Queries (Last 7 Days)</td><td><strong id="an-7d">—</strong></td></tr>
+        <tr><td class="text-muted">AI Response Rate</td><td><strong id="an-rate">—</strong></td></tr>
+      </table>
+      <hr>
+      <div style="font-size:11px;color:var(--txt-muted);font-weight:600;margin-bottom:8px;">Pipeline Health</div>
+      <div style="font-size:11px;color:var(--txt-muted);line-height:2.2;">
+        <div>Rule Engine: <span style="color:var(--green);">✔ Online (50+ patterns)</span></div>
+        <div>ML Classifier: <span style="color:var(--green);">✔ Online</span></div>
+        <div>Mistral AI: <span style="color:var(--gold);">✔ Fallback Active</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOT CONFIG -->
+<div class="panel" id="panel-cbmconfig">
+  <div class="sec-head">
+    <h3><i class="fa fa-sliders-h" style="color:var(--purple)"></i> Chatbot Configuration</h3>
+  </div>
+  <div class="row2">
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:16px;">🔧 Chatbot Settings</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Enable Chatbot</div>
+          <div class="settings-desc">Toggle chatbot for all platform users</div>
+        </div>
+        <label class="toggle-sw"><input type="checkbox" id="cbm-chatbot-enabled" onchange="saveCbmCfg('chatbot_enabled', this.checked?'1':'0')"><span class="toggle-sl"></span></label>
+      </div>
+      <div id="cbm-cfg-msg" style="display:none;" class="mt-8"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px;">📖 System Intents (Read-Only)</div>
+      <div style="font-size:11px;color:var(--txt-muted);margin-bottom:10px;">Built-in legal response patterns (cannot be deleted)</div>
+      <div style="font-size:12px;color:var(--txt-muted);line-height:2.2;">
+        <div>• Hit & Run / Motor Accident</div>
+        <div>• Cheque Bounce (Section 138 NI Act)</div>
+        <div>• Domestic Violence / 498A</div>
+        <div>• Cyber Crime / UPI / OTP Fraud</div>
+        <div>• Divorce / Separation / Alimony</div>
+        <div>• Consumer Complaint (CPA 2019)</div>
+        <div>• Bail / Arrest Rights</div>
+        <div>• FIR Filing Process</div>
+        <div>• Labour / Employment Dispute</div>
+        <div>• RERA / Builder Fraud</div>
+        <div>• Extortion / Blackmail</div>
+        <div style="margin-top:8px;color:var(--green);font-size:11px;">+ 40 more patterns built-in</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════════════
+     PROFILE (ALL ROLES)
+════════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-profile">
+  <div class="sec-head"><h3><i class="fa fa-user-circle" style="color:var(--accent)"></i> My Profile</h3></div>
+  <div class="row2">
+    <div class="card">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:70px;height:70px;border-radius:50%;
+          {% if role=='admin' %}background:rgba(245,158,11,0.15);color:#f59e0b;
+          {% elif role=='lawyer' %}background:rgba(16,185,129,0.15);color:#10b981;
+          {% elif role=='chatbot_manager' %}background:rgba(139,92,246,0.15);color:#8b5cf6;
+          {% else %}background:rgba(59,130,246,0.15);color:#3b82f6;{% endif %}
+          display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 12px;">
+          {% if role=='admin' %}🛡️{% elif role=='lawyer' %}⚖️{% elif role=='chatbot_manager' %}🤖{% else %}👤{% endif %}
+        </div>
+        <div style="font-size:18px;font-weight:800;" id="profile-display-name">{{ username }}</div>
+        <div style="font-size:12px;color:var(--txt-muted);margin-top:4px;" id="profile-display-email"></div>
+      </div>
+      <table class="tbl" style="font-size:13px;">
+        <tr><td class="text-muted">Username</td><td><strong>{{ username }}</strong></td></tr>
+        <tr><td class="text-muted">Role</td><td>
+          {% if role=='client' %}<span class="badge badge-blue">👤 Client</span>
+          {% elif role=='lawyer' %}<span class="badge badge-green">⚖️ Lawyer</span>
+          {% elif role=='admin' %}<span class="badge badge-gold">🛡️ Admin</span>
+          {% elif role=='chatbot_manager' %}<span class="badge badge-purple">🤖 Bot Manager</span>{% endif %}
+        </td></tr>
+        <tr><td class="text-muted">Platform</td><td>LexAI v2.0</td></tr>
+        <tr><td class="text-muted">Project</td><td>MCA 2026</td></tr>
+        <tr><td class="text-muted">Session</td><td><span style="color:var(--green);">● Active</span></td></tr>
+      </table>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <!-- Update Profile -->
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;">✏️ Update Profile Info</div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="profileName" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="profileEmail" placeholder="your@email.com">
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="updateProfile()">Save Profile</button>
+        <div id="profile-update-msg" style="display:none;" class="mt-8"></div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;margin-bottom:14px;">🔒 Change Password</div>
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" class="form-control" id="cpCurrent" placeholder="Enter current password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Password (min. 6 chars)</label>
+          <input type="password" class="form-control" id="cpNew" placeholder="Enter new password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <input type="password" class="form-control" id="cpConfirm" placeholder="Confirm new password">
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="changePassword()">Update Password</button>
+        <div id="cp-msg" style="display:none;" class="mt-8"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════ -->
+
+<!-- Case Detail Modal (Client) -->
+<div class="modal-bg" id="caseDetailModal">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-header">
+      <h4 id="cdm-title">Case Details</h4>
+      <button class="modal-close" onclick="closeModal('caseDetailModal')">✕</button>
+    </div>
+    <div id="cdm-body">
+      <div class="text-center text-muted" style="padding:30px;"><i class="fa fa-spinner fa-spin"></i> Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Create User (Admin) -->
+<div class="modal-bg" id="createUserModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h4><i class="fa fa-user-plus" style="color:var(--accent);margin-right:8px;"></i>Create New User</h4>
+      <button class="modal-close" onclick="closeModal('createUserModal')"><i class="fa fa-times"></i></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Username *</label>
+      <input type="text" class="form-control" id="cu-username" placeholder="At least 3 characters">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password *</label>
+      <input type="password" class="form-control" id="cu-password" placeholder="At least 6 characters">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role *</label>
+      <select class="form-control" id="cu-role">
+        <option value="client">Client</option>
+        <option value="lawyer">Lawyer</option>
+        <option value="chatbot_manager">Chatbot Manager</option>
+        <option value="admin">Admin</option>
+      </select>
+      <div style="font-size:10px;color:var(--txt-muted);margin-top:4px;">Only Admins can create Admin and Chatbot Manager accounts.</div>
+    </div>
+    <div id="cu-msg" style="display:none;" class="mb-8"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('createUserModal')">Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="createUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════ -->
+<script>
+const ROLE = '{{ role }}';
+const USERNAME = '{{ username }}';
+
+// ─── THEME TOGGLE ─────────────────────────────────────────
+function toggleTheme() {
+  const html  = document.documentElement;
+  const curr  = html.getAttribute('data-theme') || 'dark';
+  const next  = curr === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  html.style.colorScheme = next === 'light' ? 'light' : 'dark';
+  localStorage.setItem('lexai-theme', next);
+  document.getElementById('themeIcon').className = next === 'dark' ? 'fa fa-moon' : 'fa fa-sun';
+}
+// Set correct icon on load
+(function(){
+  const t = localStorage.getItem('lexai-theme')||'dark';
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t==='dark' ? 'fa fa-moon' : 'fa fa-sun';
+})();
+
+// ─── NOTIFICATIONS ────────────────────────────────────────
+let notifOpen = false;
+async function toggleNotifs() {
+  const dd = document.getElementById('notifDropdown');
+  notifOpen = !notifOpen;
+  dd.style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) await loadNotifs();
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('notifBtn');
+  const dd  = document.getElementById('notifDropdown');
+  if (notifOpen && dd && !dd.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    notifOpen = false; dd.style.display='none';
+  }
+});
+async function loadNotifs() {
+  const list  = document.getElementById('notifList');
+  const badge = document.getElementById('notifBadge');
+  try {
+    const d = await (await fetch('/api/notifications')).json();
+    if (!d.length) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--txt-muted);font-size:12px;">No notifications yet.</div>';
+      badge.style.display='none'; return;
+    }
+    list.innerHTML = d.map(n => `
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:16px;flex-shrink:0;">${n.icon}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;color:var(--txt);line-height:1.4;">${esc(n.text)}</div>
+          <div style="font-size:10px;color:var(--txt-muted);margin-top:2px;">${(n.time||'').slice(0,16)}</div>
+        </div>
+      </div>
+    `).join('');
+    badge.textContent = d.length;
+    badge.style.display = 'flex';
+  } catch {
+    list.innerHTML = '<div style="padding:14px;color:var(--red);font-size:12px;">Failed to load notifications.</div>';
+  }
+}
+// Auto-poll notifications every 60s
+setInterval(async () => {
+  const badge = document.getElementById('notifBadge');
+  try { const d = await (await fetch('/api/notifications')).json(); if(d.length) { badge.textContent=d.length; badge.style.display='flex'; } } catch {}
+}, 60000);
+// initial badge load
+(async function(){ try{ const d=await(await fetch('/api/notifications')).json(); const b=document.getElementById('notifBadge'); if(b&&d.length){b.textContent=d.length;b.style.display='flex';} }catch{} })();
+
+// ─── LIVE CLOCK ───────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveTime').textContent =
+    now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ─── PANEL ROUTING ────────────────────────────────────────
+const PANEL_LABELS = {
+  home: 'Dashboard', mycases: 'My Cases', appointments: 'My Appointments',
+  queue: 'Case Queue', lappts: 'Appointment Requests', mynotes: 'My Notes',
+  users: 'User Management', allcases: 'All Cases', adminlogs: 'Chatbot Logs',
+  settings: 'System Settings', intents: 'Intent Manager', logs: 'Conversation Logs',
+  analytics: 'Analytics', cbmconfig: 'Bot Config', profile: 'My Profile',
+};
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(a => a.classList.remove('active'));
+  const p = document.getElementById('panel-' + name);
+  if (p) p.classList.add('active');
+  const nav = document.getElementById('nav-' + name);
+  if (nav) nav.classList.add('active');
+  else document.getElementById('nav-home')?.classList.add('active');
+  document.getElementById('pageTitle').innerHTML =
+    `<i class="fa fa-circle" style="color:var(--accent);font-size:8px;margin-right:8px;"></i>${PANEL_LABELS[name]||name}`;
+
+  // Lazy-load data
+  if (name === 'mycases')    loadMyCases();
+  if (name === 'appointments') loadClientAppts();
+  if (name === 'queue')      loadLawyerQueue();
+  if (name === 'lappts')     loadLawyerAppts();
+  if (name === 'mynotes')    loadMyNotes();
+  if (name === 'users')      loadAdminUsers();
+  if (name === 'allcases')   loadAllCases();
+  if (name === 'adminlogs')  loadAdminLogs();
+  if (name === 'settings')   loadSettings();
+  if (name === 'intents')    loadIntents();
+  if (name === 'logs')       loadCbmLogs();
+  if (name === 'analytics')  loadAnalytics();
+  if (name === 'cbmconfig')  loadCbmConfig();
+  if (name === 'profile')    loadProfileData();
+}
+
+// ─── HELPERS ──────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtDate(s) { return (s||'').slice(0,10); }
+function fmtCat(c) { return (c||'').replace(/_/g,' ').replace(/\b\w/g,ch=>ch.toUpperCase()); }
+function riskBadge(r) {
+  const cls = r==='High'?'badge-red':r==='Low'?'badge-green':'badge-gold';
+  return `<span class="badge ${cls}">${r||'?'}</span>`;
+}
+function statusBadge(s) {
+  const m = {pending:'badge-gold',reviewed:'badge-green',closed:'badge-gray',accepted:'badge-green',declined:'badge-red',requested:'badge-blue',completed:'badge-cyan',cancelled:'badge-gray'};
+  return `<span class="badge ${m[s]||'badge-gray'}">${esc(s)}</span>`;
+}
+function showMsg(id, msg, type='success') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `alert alert-${type}`;
+  el.innerHTML = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 4000);
+}
+
+// ─── MODAL ────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id)?.classList.add('open'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ─── LEGAL FACTS ──────────────────────────────────────────
+const FACTS = [
+  'Cyber Crime Helpline: 1930. Call within 72 hours — banks can freeze fraudulent transactions.',
+  'Police MUST register FIR for any cognizable offense. If they refuse, go to SP or Magistrate Court.',
+  'Cheque Bounce — send Legal Notice within 30 days of bounce memo, or the case is barred permanently.',
+  'Consumer complaints up to ₹50 Lakhs can be filed FREE at edaakhil.nic.in.',
+  'Under RERA 2016, builders must pay 10.85% p.a. interest for delayed flat possession.',
+  'Anticipatory Bail (Section 438 CrPC) can be filed even before arrest in Sessions Court.',
+  'Daughters have EQUAL rights in ancestral property under 2005 amendment (Hindu Succession Act).',
+  'Zero FIR — you can file FIR at ANY police station, regardless of jurisdiction.',
+  'Under BNSS 2023, police must immediately inform family/friend of any arrest.',
+  'Section 125 CrPC → Women and children can get maintenance from Magistrate Court quickly.',
+];
+let factIdx = 0;
+function rotateFact() {
+  const el = document.getElementById('legalFact');
+  if (el) { el.style.opacity=0; setTimeout(()=>{ el.textContent=FACTS[factIdx]; el.style.opacity=1; factIdx=(factIdx+1)%FACTS.length; },300); }
+}
+if (document.getElementById('legalFact')) {
+  document.getElementById('legalFact').style.transition = 'opacity 0.3s';
+  rotateFact(); setInterval(rotateFact, 7000);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHATBOT ENGINE — shared analysis fetch
+// ═══════════════════════════════════════════════════════════
+async function fetchAnalyze(text) {
+  const res = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text})
+  });
+  return await res.json();
+}
+
+// Append message to any chat container
+function appendMsg(containerId, role, html) {
+  const box = document.getElementById(containerId);
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'msg-user' : 'msg-ai';
+  if (role === 'user') {
+    div.innerHTML = `<div class="msg-bubble">${esc(html)}</div>`;
+  } else {
+    div.innerHTML = `<div><div class="msg-sender">Adv. LexAI</div><div class="msg-bubble">${html}</div></div>`;
+  }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+function appendTyping(containerId) {
+  const box = document.getElementById(containerId);
+  if (!box) return null;
+  const div = document.createElement('div');
+  div.className = 'msg-ai';
+  div.innerHTML = `<div><div class="msg-sender">Adv. LexAI</div><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+// ML panel renderer
+function renderMlPanel(d, prefix) {
+  const results = document.getElementById(prefix+'MlResults');
+  const empty   = document.getElementById(prefix+'MlEmpty');
+  if (!d.has_ml || !results) return;
+  if (empty) empty.style.display = 'none';
+  results.style.display = 'block';
+
+  const catEl  = document.getElementById(prefix.replace('client','c').replace('lawyer','l')+'ml-cat'  ) ||
+                 document.getElementById('cml-cat') || document.getElementById('lml-cat');
+
+  const setId = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  const setHtml = (id, val) => { const el=document.getElementById(id); if(el) el.innerHTML=val; };
+
+  const p = prefix === 'client' ? 'cml' : 'lml';
+  setId(`${p}-cat`,  fmtCat(d.category));
+  setId(`${p}-catconf`, `Confidence: ${d.cat_confidence||0}%`);
+
+  const risk = d.risk_level||'Medium';
+  const riskEl = document.getElementById(`${p}-risk`);
+  if (riskEl) {
+    riskEl.textContent = risk;
+    riskEl.className = 'ml-box-value ' + (risk==='High'?'text-red':risk==='Low'?'text-green':'text-gold');
+  }
+  setId(`${p}-riskconf`, `Confidence: ${d.risk_confidence||0}%`);
+
+  const prob  = d.win_probability||60;
+  const color = prob>=70?'var(--green)':prob>=50?'var(--gold)':'var(--red)';
+  setId(`${p}-prob`, prob+'%');
+  const ring = document.getElementById(`${p}-ring`);
+  if (ring) ring.style.background = `conic-gradient(${color} ${prob}%, var(--bg-el) ${prob}%)`;
+
+  setHtml(`${p}-advice`, esc(d.strategy?.advice||''));
+
+  const steps = d.strategy?.steps||[];
+  const stepsBox = document.getElementById(`${p}-stepsbox`);
+  if (stepsBox && steps.length) {
+    stepsBox.style.display='block';
+    setHtml(`${p}-steps`, steps.map(s=>`<li>${esc(s)}</li>`).join(''));
+  }
+  const laws = d.strategy?.applicable_laws||[];
+  const lawsBox = document.getElementById(`${p}-lawsbox`);
+  if (lawsBox && laws.length) {
+    lawsBox.style.display='block';
+    setHtml(`${p}-laws`, laws.map(l=>`<span class="law-tag">${esc(l)}</span>`).join(''));
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CLIENT CHATBOT — command state machine
+// ═══════════════════════════════════════════════════════════
+let clientState = null; // null | 'case_title' | 'case_desc' | 'appt_cat' | 'appt_note' | 'cancel_appt'
+let clientCtx   = {};
+
+const CLIENT_CMDS = {
+  'submit case':        startCaseFlow,
+  'new case':           startCaseFlow,
+  'naya case':          startCaseFlow,
+  'case submit':        startCaseFlow,
+  'book appointment':   startApptFlow,
+  'appointment book':   startApptFlow,
+  'book appt':          startApptFlow,
+  'cancel appointment': startCancelApptFlow,
+  'cancel appt':        startCancelApptFlow,
+  'my cases':           showMyCasesInChat,
+  'mere cases':         showMyCasesInChat,
+  'mera case':          showMyCasesInChat,
+  'case status':        showMyCasesInChat,
+  'help':               showClientHelp,
+  'madad':              showClientHelp,
+};
+
+function setClientState(state, txt) {
+  clientState = state;
+  const bar  = document.getElementById('clientStateBar');
+  const span = document.getElementById('clientStateText');
+  if (bar && span) {
+    if (state) { bar.style.display='flex'; span.textContent = txt||state; }
+    else bar.style.display = 'none';
+  }
+}
+
+function clientCmd(cmd) {
+  document.getElementById('clientChatInput').value = cmd;
+  clientSend();
+  // Switch to home panel if needed
+  if (!document.getElementById('panel-home')?.classList.contains('active')) {
+    showPanel('home');
+  }
+}
+function switchToHomeAndCmd(cmd) { showPanel('home'); setTimeout(()=>clientCmd(cmd), 100); }
+
+async function clientSend(prefill) {
+  const input = document.getElementById('clientChatInput');
+  const text  = prefill || input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendMsg('clientChatMsgs', 'user', text);
+  document.getElementById('clientSendBtn').disabled = true;
+
+  if (clientState) {
+    await handleClientState(text);
+    document.getElementById('clientSendBtn').disabled = false;
+    return;
+  }
+
+  const lower = text.toLowerCase().trim();
+  // Strict command matching: only trigger if the message IS the command, or very close to it.
+  // Extra slack of 15 chars prevents long complaint sentences from accidentally firing commands.
+  // e.g. "mera case submit nahi ho raha..." should NOT trigger "mera case" command.
+  for (const [cmd, fn] of Object.entries(CLIENT_CMDS)) {
+    const slack = 15; // allow up to 15 extra characters
+    if (lower.length <= cmd.length + slack &&
+       (lower === cmd ||
+        lower.startsWith(cmd + ' ') ||
+        lower.startsWith(cmd + ',') ||
+        lower.endsWith(' ' + cmd) ||
+        lower.endsWith(',' + cmd))) {
+      await fn();
+      document.getElementById('clientSendBtn').disabled = false;
+      return;
+    }
+  }
+
+
+  // Normal AI chat
+  const typing = appendTyping('clientChatMsgs');
+  try {
+    const d = await fetchAnalyze(text);
+    typing?.remove();
+    appendMsg('clientChatMsgs', 'ai', d.message || d.error || '⚠️ Error. Please try again.');
+    if (d.has_ml) renderMlPanel(d, 'client');
+  } catch {
+    typing?.remove();
+    appendMsg('clientChatMsgs', 'ai', '⚠️ Server error. Please try again.');
+  }
+  document.getElementById('clientSendBtn').disabled = false;
+}
+
+async function handleClientState(text) {
+  const typing = appendTyping('clientChatMsgs');
+  await new Promise(r => setTimeout(r, 500));
+  typing?.remove();
+
+  if (clientState === 'case_title') {
+    clientCtx.title = text;
+    setClientState('case_desc', 'Step 2/2: Describe your case…');
+    appendMsg('clientChatMsgs', 'ai',
+      `📝 <strong>Case Title recorded:</strong> "${esc(text)}"<br><br>Now describe your problem in detail:<br>• What happened?<br>• When did it happen?<br>• Who is involved?<br>• What is the dispute about?<br><br><em>More details = better ML analysis.</em>`);
+    return;
+  }
+
+  if (clientState === 'case_desc') {
+    clientCtx.description = text;
+    setClientState(null);
+    // Submit case
+    const typing2 = appendTyping('clientChatMsgs');
+    try {
+      const res = await fetch('/api/cases', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({title: clientCtx.title, description: clientCtx.description})
+      });
+      const d = await res.json();
+      typing2?.remove();
+      if (d.case_id) {
+        const risk = d.risk_level||'Medium';
+        const riskColor = risk==='High'?'var(--red)':risk==='Low'?'var(--green)':'var(--gold)';
+        const catNote = {
+          'criminal':'Theft, murder, assault, etc. — sabhi criminal offenses IPC/BNS ke under aate hain',
+          'fraud':'Cheque bounce, online fraud, financial cheating — yeh fraud category mein hain',
+          'family':'Divorce, dowry, domestic violence, custody — family law ke matters',
+          'property':'Zameen, makaan, rent, RERA disputes — property law',
+          'labour':'Job termination, salary, PF, workplace rights — labour law',
+          'consumer':'Defective product, refund, insurance — Consumer Protection Act',
+          'motor_accident':'Road accident, MACT claim, vehicle insurance — Motor Vehicles Act'
+        };
+        const note = catNote[d.category] || '';
+        appendMsg('clientChatMsgs', 'ai',
+          `✅ <strong>Case Submitted Successfully!</strong><br><br>
+           🆔 Case ID: <strong>#${d.case_id}</strong><br>
+           📂 Category: <strong>${fmtCat(d.category)}</strong> (${d.cat_confidence}% confidence)<br>
+           ${note ? `<em style="font-size:11px;color:var(--txt-muted);">ℹ️ ${note}</em><br>` : ''}
+           ⚠️ Risk Level: <strong style="color:${riskColor};">${risk}</strong><br>
+           🏆 Win Probability: <strong>${d.win_probability}%</strong><br><br>
+           📋 Our lawyers have been notified. You'll receive a review soon.<br><br>
+           <em>View your case in <strong>My Cases</strong> panel.</em><br><br>
+           Koi aur sawaal ho toh seedha pooch sakte ho! 🙏`);
+
+        renderMlPanel(d, 'client');
+        loadClientStats();
+      } else {
+        appendMsg('clientChatMsgs', 'ai', `❌ ${esc(d.error || 'Could not submit case. Please try again.')}`);
+      }
+    } catch {
+      typing2?.remove();
+      appendMsg('clientChatMsgs', 'ai', '⚠️ Network error. Please try again.');
+    }
+    clientCtx = {};
+    return;
+  }
+
+  if (clientState === 'appt_cat') {
+    clientCtx.category = text;
+    setClientState('appt_note', 'Step 2/2: Add a note…');
+    appendMsg('clientChatMsgs', 'ai',
+      `📅 Category: <strong>${fmtCat(text)}</strong><br><br>Add a brief note for the lawyer (or type <em>"skip"</em> to skip):`)
+    return;
+  }
+
+  if (clientState === 'appt_note') {
+    clientCtx.note = (text.toLowerCase()==='skip') ? '' : text;
+    setClientState(null);
+    const typing2 = appendTyping('clientChatMsgs');
+    try {
+      const res = await fetch('/api/book_appointment', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({category: clientCtx.category, note: clientCtx.note})
+      });
+      const d = await res.json();
+      typing2?.remove();
+      if (d.ok) {
+        appendMsg('clientChatMsgs', 'ai',
+          `✅ <strong>Appointment Requested!</strong><br><br>
+           📅 Category: <strong>${fmtCat(clientCtx.category)}</strong><br>
+           📝 Note: ${esc(clientCtx.note||'None')}<br><br>
+           A specialist lawyer will contact you shortly.<br><em>View in <strong>My Appointments</strong> panel.</em>`);
+        loadClientStats();
+      } else {
+        appendMsg('clientChatMsgs', 'ai', `❌ ${esc(d.message||'Could not book appointment.')}`);
+      }
+    } catch {
+      typing2?.remove();
+      appendMsg('clientChatMsgs', 'ai', '⚠️ Network error. Please try again.');
+    }
+    clientCtx = {};
+    return;
+  }
+
+  if (clientState === 'cancel_appt') {
+    const num = parseInt(text);
+    if (isNaN(num) || !clientCtx.appts || !clientCtx.appts[num-1]) {
+      setClientState(null); clientCtx = {};
+      appendMsg('clientChatMsgs', 'ai', '❌ Invalid selection. Please try again.');
+      return;
+    }
+    const appt = clientCtx.appts[num-1];
+    setClientState(null); clientCtx = {};
+    const typing2 = appendTyping('clientChatMsgs');
+    try {
+      const res = await fetch(`/api/appointments/${appt.id}/cancel`, {method:'DELETE'});
+      const d = await res.json();
+      typing2?.remove();
+      if (d.ok) {
+        appendMsg('clientChatMsgs', 'ai', `✅ <strong>Appointment Cancelled</strong><br><br>Your appointment for <strong>${fmtCat(appt.category)}</strong> has been cancelled.`);
+        loadClientStats();
+      } else {
+        appendMsg('clientChatMsgs', 'ai', `❌ ${esc(d.msg||'Could not cancel.')}`);
+      }
+    } catch {
+      typing2?.remove();
+      appendMsg('clientChatMsgs', 'ai', '⚠️ Error cancelling appointment.');
+    }
+  }
+}
+
+function startCaseFlow() {
+  setClientState('case_title', 'Step 1/2: Enter case title…');
+  appendMsg('clientChatMsgs', 'ai',
+    `📁 <strong>New Case Submission</strong><br><br>
+     Let's submit your case step by step.<br><br>
+     <strong>Step 1/2:</strong> What is the title or subject of your case?<br>
+     <em>E.g., "Property dispute with neighbor", "Cyber fraud by online seller", "Wrongful termination from job"</em>`);
+}
+
+function startApptFlow() {
+  setClientState('appt_cat', 'Step 1/2: Select category…');
+  appendMsg('clientChatMsgs', 'ai',
+    `📅 <strong>Book Lawyer Appointment</strong><br><br>
+     What type of legal matter do you need consultation for?<br><br>
+     Type one of: <strong>property</strong>, <strong>family</strong>, <strong>labour</strong>, <strong>fraud</strong>,
+     <strong>consumer</strong>, <strong>criminal</strong>, <strong>motor_accident</strong>, or <strong>general</strong>`);
+}
+
+async function startCancelApptFlow() {
+  const typing = appendTyping('clientChatMsgs');
+  try {
+    const res = await fetch('/api/appointments');
+    const appts = await res.json();
+    typing?.remove();
+    const active = appts.filter(a => !['completed','declined','cancelled'].includes(a.status));
+    if (!active.length) {
+      appendMsg('clientChatMsgs', 'ai', '📅 You have no active appointments to cancel.');
+      return;
+    }
+    clientCtx.appts = active;
+    setClientState('cancel_appt', 'Select appointment number to cancel…');
+    const list = active.map((a,i) =>
+      `${i+1}. <strong>${fmtCat(a.category)}</strong> — ${statusBadge(a.status)} — ${fmtDate(a.created)}`
+    ).join('<br>');
+    appendMsg('clientChatMsgs', 'ai',
+      `❌ <strong>Cancel Appointment</strong><br><br>Your active appointments:<br><br>${list}<br><br>Type the <strong>number</strong> of the appointment to cancel:`);
+  } catch {
+    typing?.remove();
+    appendMsg('clientChatMsgs', 'ai', '⚠️ Could not load appointments.');
+  }
+}
+
+async function showMyCasesInChat() {
+  const typing = appendTyping('clientChatMsgs');
+  try {
+    const res = await fetch('/api/cases');
+    const cases = await res.json();
+    typing?.remove();
+    if (!cases.length) { appendMsg('clientChatMsgs','ai','📁 You have no cases yet. Type <em>"submit case"</em> to submit one.'); return; }
+    const list = cases.slice(0,5).map(c =>
+      `• <strong>${esc(c.title)}</strong><br>&nbsp;&nbsp;${riskBadge(c.risk_level)} ${statusBadge(c.status)} — Win: ${c.outcome_prob||'?'}% — ${fmtDate(c.created)}`
+    ).join('<br><br>');
+    appendMsg('clientChatMsgs', 'ai',
+      `📁 <strong>Your Cases (latest ${Math.min(cases.length,5)}):</strong><br><br>${list}<br><br><em>Go to <strong>My Cases</strong> panel for full view.</em>`);
+  } catch {
+    typing?.remove();
+    appendMsg('clientChatMsgs', 'ai', '⚠️ Could not load cases.');
+  }
+}
+
+function showClientHelp() {
+  appendMsg('clientChatMsgs', 'ai',
+    `❓ <strong>LexAI Client Help Guide</strong><br><br>
+     🔹 <em>"submit case"</em> — Submit a new legal case<br>
+     🔹 <em>"book appointment"</em> — Book a lawyer consultation<br>
+     🔹 <em>"cancel appointment"</em> — Cancel an existing appointment<br>
+     🔹 <em>"my cases"</em> — View your case statuses<br>
+     🔹 <em>Any legal question</em> — Get AI legal guidance<br><br>
+     📌 <strong>Emergency Helplines:</strong><br>
+     • Police / Emergency: <strong>112</strong><br>
+     • Cyber Crime: <strong>1930</strong><br>
+     • Women Helpline: <strong>181</strong><br>
+     • National Consumer Helpline: <strong>1800-11-4000</strong>`);
+}
+
+// ─── CLIENT DATA LOADERS ──────────────────────────────────
+async function loadClientStats() {
+  if (ROLE !== 'client') return;
+  try {
+    const d = await (await fetch('/api/client/stats')).json();
+    ['total','pending','reviewed'].forEach(k => {
+      const el = document.getElementById(`cs-${k}`)||document.getElementById(`mc-${k}`);
+      if (el) animateCount(el, d[k]||0);
+    });
+    const apEl = document.getElementById('cs-appts');
+    if (apEl) animateCount(apEl, d.total_appts||0);
+    // also update my cases stats
+    ['total','pending','reviewed'].forEach(k => {
+      const el2 = document.getElementById(`mc-${k}`);
+      if (el2) animateCount(el2, d[k]||0);
+    });
+    const mcClosed = document.getElementById('mc-closed');
+    if (mcClosed) animateCount(mcClosed, d.closed||0);
+  } catch {}
+}
+
+function animateCount(el, target) {
+  let current = 0; const step = Math.max(1, Math.floor(target/20));
+  const timer = setInterval(() => {
+    current = Math.min(current+step, target);
+    el.textContent = current;
+    if (current >= target) clearInterval(timer);
+  }, 40);
+}
+
+async function loadMyCases() {
+  try {
+    const cases = await (await fetch('/api/cases')).json();
+    loadClientStats();
+    const container = document.getElementById('myCasesList');
+    if (!container) return;
+    if (!cases.length) {
+      container.innerHTML = `<div class="empty-state"><i class="fa fa-folder-open"></i><p>No cases submitted yet.</p><button class="btn btn-primary btn-sm" onclick="switchToHomeAndCmd('submit case')">Submit Your First Case</button></div>`;
+      return;
+    }
+    container.innerHTML = cases.map(c => `
+      <div class="case-card risk-${(c.risk_level||'low').toLowerCase()}" onclick="openClientCaseDetail(${c.id})" style="cursor:pointer;">
+        <div class="d-flex justify-between align-center">
+          <div class="case-title">${esc(c.title)}</div>
+          <div class="d-flex gap-8 align-center">
+            ${statusBadge(c.status)}
+            ${c.status==='pending'?`<button class="btn btn-xs btn-danger" onclick="event.stopPropagation();cancelCase(${c.id}, this)" title="Cancel Case"><i class="fa fa-times"></i></button>`:''}
+          </div>
+        </div>
+        <div class="case-desc text-muted">${esc(c.description)}</div>
+        <div class="case-meta">
+          <span class="badge badge-blue">${fmtCat(c.category)}</span>
+          ${riskBadge(c.risk_level)}
+          <span class="badge badge-gray">Win: ${c.outcome_prob||'?'}%</span>
+          <span class="text-muted" style="font-size:11px;margin-left:auto;">${fmtDate(c.created)}</span>
+          <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();downloadNotice(${c.id})"><i class="fa fa-download"></i> Notice</button>
+          <span class="text-muted" style="font-size:10px;"><i class="fa fa-eye"></i> Click to view details</span>
+        </div>
+      </div>
+    `).join('');
+  } catch { document.getElementById('myCasesList').innerHTML = '<div class="alert alert-danger">Error loading cases.</div>'; }
+}
+
+async function openClientCaseDetail(caseId) {
+  openModal('caseDetailModal');
+  const body = document.getElementById('cdm-body');
+  body.innerHTML = '<div class="text-center" style="padding:30px;"><i class="fa fa-spinner fa-spin"></i> Loading…</div>';
+  try {
+    const d = await (await fetch(`/api/cases/${caseId}/client_view`)).json();
+    const c = d.case;
+    document.getElementById('cdm-title').textContent = c.title;
+    const notes = d.notes||[];
+    const msgs  = d.messages||[];
+    body.innerHTML = `
+      <div class="d-flex gap-8 mb-8" style="flex-wrap:wrap;">
+        <span class="badge badge-blue">${fmtCat(c.category)}</span>
+        ${riskBadge(c.risk_level)}
+        <span class="badge badge-gray">Win: ${c.outcome_prob||'?'}%</span>
+        ${statusBadge(c.status)}
+        <span class="text-muted" style="font-size:11px;">${fmtDate(c.created)}</span>
+      </div>
+      <div class="card mb-8" style="padding:12px;font-size:13px;color:var(--txt-muted);line-height:1.6;">${esc(c.description)}</div>
+
+      ${notes.length ? `
+        <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">⚖️ Lawyer Notes</div>
+        ${notes.map(n=>`<div class="note-card"><div class="note-meta"><i class="fa fa-user-tie"></i> ${esc(n.lawyer_name)} · ${fmtDate(n.created)}</div><div class="note-text">${esc(n.note)}</div></div>`).join('')}
+      ` : '<div class="alert alert-info" style="font-size:12px;">ℹ️ No lawyer notes yet. Your case is queued for review.</div>'}
+
+      ${msgs.length ? `
+        <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.8px;margin:10px 0 8px;">💬 Messages</div>
+        ${msgs.map(m=>`<div class="log-item"><div class="log-meta"><span>${esc(m.sender)} (${m.role})</span><span>${fmtDate(m.created)}</span></div><div class="log-q">${esc(m.content)}</div></div>`).join('')}
+      ` : ''}
+
+      <button class="btn btn-ghost btn-sm mt-8" onclick="closeModal('caseDetailModal')">&larr; Close</button>
+    `;
+  } catch {
+    body.innerHTML = '<div class="alert alert-danger">Error loading case details.</div>';
+  }
+}
+
+async function cancelCase(id, btn) {
+  if (!confirm('Cancel this pending case?')) return;
+  btn.disabled = true;
+  try {
+    const d = await (await fetch(`/api/cases/${id}/cancel`, {method:'DELETE'})).json();
+    if (d.ok) { loadMyCases(); loadClientStats(); }
+    else alert(d.msg||'Cannot cancel.');
+  } catch { btn.disabled=false; }
+}
+
+async function downloadNotice(caseId) {
+  const d = await (await fetch(`/api/cases/${caseId}/document`)).json();
+  const blob = new Blob([d.document], {type:'text/plain'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`legal_notice_case_${caseId}.txt`; a.click();
+}
+
+async function loadClientAppts() {
+  try {
+    const data = await (await fetch('/api/appointments')).json();
+    const tbody = document.getElementById('clientApptBody');
+    if (!tbody) return;
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:30px;">No appointments yet. Type "book appointment" in the chatbot.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((a,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${fmtCat(a.category)}</td>
+        <td>${esc(a.note||'—')}</td>
+        <td>${statusBadge(a.status)}</td>
+        <td>${fmtDate(a.created)}</td>
+        <td>${!['completed','declined','cancelled'].includes(a.status)?
+          `<button class="btn btn-xs btn-danger" onclick="cancelAppt(${a.id}, this)"><i class="fa fa-times"></i> Cancel</button>`:'—'}</td>
+      </tr>
+    `).join('');
+  } catch {}
+}
+
+async function cancelAppt(id, btn) {
+  if (!confirm('Cancel this appointment?')) return;
+  btn.disabled = true;
+  try {
+    const d = await (await fetch(`/api/appointments/${id}/cancel`, {method:'DELETE'})).json();
+    if (d.ok) loadClientAppts();
+    else { alert(d.msg||'Cannot cancel.'); btn.disabled=false; }
+  } catch { btn.disabled=false; }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  LAWYER CHATBOT
+// ═══════════════════════════════════════════════════════════
+async function lawyerSend(prefill) {
+  const input = document.getElementById('lawyerChatInput');
+  const text  = prefill || input?.value.trim();
+  if (!text) return;
+  if (input) input.value = '';
+  appendMsg('lawyerChatMsgs', 'user', text);
+  if (document.getElementById('lawyerSendBtn')) document.getElementById('lawyerSendBtn').disabled = true;
+
+  const lower = text.toLowerCase();
+  if (lower.includes('pending cases') || lower.includes('show cases')) {
+    await showLawyerCaseSummary(); 
+    if (document.getElementById('lawyerSendBtn')) document.getElementById('lawyerSendBtn').disabled = false;
+    return;
+  }
+  if (lower.includes('appointment')) {
+    await showLawyerApptSummary();
+    if (document.getElementById('lawyerSendBtn')) document.getElementById('lawyerSendBtn').disabled = false;
+    return;
+  }
+
+  const typing = appendTyping('lawyerChatMsgs');
+  try {
+    const d = await fetchAnalyze(text);
+    typing?.remove();
+    appendMsg('lawyerChatMsgs', 'ai', d.message || '⚠️ Error fetching response.');
+    if (d.has_ml) renderMlPanel(d, 'lawyer');
+  } catch {
+    typing?.remove();
+    appendMsg('lawyerChatMsgs', 'ai', '⚠️ Server error.');
+  }
+  if (document.getElementById('lawyerSendBtn')) document.getElementById('lawyerSendBtn').disabled = false;
+}
+
+async function showLawyerCaseSummary() {
+  const typing = appendTyping('lawyerChatMsgs');
+  try {
+    const cases = await (await fetch('/api/cases')).json();
+    typing?.remove();
+    const pending = cases.filter(c=>c.status==='pending');
+    const list = pending.slice(0,5).map(c =>
+      `• #${c.id} <strong>${esc(c.title)}</strong><br>&nbsp;&nbsp;By: ${esc(c.username||'?')} | ${riskBadge(c.risk_level)} | ${fmtDate(c.created)}`
+    ).join('<br><br>');
+    appendMsg('lawyerChatMsgs', 'ai',
+      `📋 <strong>${pending.length} Pending Cases</strong>:<br><br>${list||'No pending cases!'}<br><br><em>Go to <strong>Case Queue</strong> panel for full view.</em>`);
+  } catch {
+    typing?.remove();
+    appendMsg('lawyerChatMsgs', 'ai', '⚠️ Could not load cases.');
+  }
+}
+
+async function showLawyerApptSummary() {
+  const typing = appendTyping('lawyerChatMsgs');
+  try {
+    const appts = await (await fetch('/api/appointments')).json();
+    typing?.remove();
+    const pending = appts.filter(a=>a.status==='requested');
+    const list = pending.slice(0,5).map(a =>
+      `• <strong>${fmtCat(a.category)}</strong> — Client: ${esc(a.client_name||'?')} | ${fmtDate(a.created)}`
+    ).join('<br>');
+    appendMsg('lawyerChatMsgs', 'ai',
+      `📅 <strong>${pending.length} Appointment Request(s)</strong>:<br><br>${list||'No pending requests.'}<br><br><em>Go to <strong>Appointment Requests</strong> panel to manage them.</em>`);
+  } catch {
+    typing?.remove();
+    appendMsg('lawyerChatMsgs', 'ai', '⚠️ Could not load appointments.');
+  }
+}
+
+// ─── LAWYER DATA LOADERS ─────────────────────────────────
+async function loadLawyerStats() {
+  if (ROLE !== 'lawyer') return;
+  try {
+    const d = await (await fetch('/api/lawyer/stats')).json();
+    ['total','pending','reviewed'].forEach(k => {
+      const el = document.getElementById(`ls-${k}`);
+      if (el) animateCount(el, d[k]||0);
+    });
+    const a = document.getElementById('ls-appts'); if (a) animateCount(a, d.appts_pending||0);
+    const n = document.getElementById('ls-notes'); if (n) animateCount(n, d.my_notes_total||0);
+  } catch {}
+}
+
+let allCasesForQueue = [];
+async function loadLawyerQueue() {
+  try {
+    const cases = await (await fetch('/api/cases')).json();
+    allCasesForQueue = cases;
+    renderQueue(cases);
+    const p = cases.filter(c=>c.status==='pending').length;
+    const r = cases.filter(c=>c.status==='reviewed').length;
+    const bp = document.getElementById('qBadgePending'); if(bp) bp.textContent=`${p} Pending`;
+    const br = document.getElementById('qBadgeReviewed'); if(br) br.textContent=`${r} Reviewed`;
+  } catch {}
+}
+
+function renderQueue(cases) {
+  const el = document.getElementById('lawyerQueueList');
+  if (!el) return;
+  if (!cases.length) { el.innerHTML = '<div class="empty-state"><i class="fa fa-inbox"></i><p>No cases found.</p></div>'; return; }
+  el.innerHTML = cases.map(c => `
+    <div class="queue-item" id="qi-${c.id}" onclick="openCaseDetail(${c.id})">
+      <div class="qi-title">${esc(c.title)}</div>
+      <div class="qi-meta">
+        ${riskBadge(c.risk_level)} ${statusBadge(c.status)}
+        <span class="text-muted" style="margin-left:6px;font-size:10px;">${fmtDate(c.created)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterQueue() {
+  const f = document.getElementById('qFilter')?.value || 'all';
+  const s = (document.getElementById('qSearch')?.value||'').toLowerCase();
+  const filtered = allCasesForQueue.filter(c =>
+    (f==='all'||c.status===f) && (!s||c.title.toLowerCase().includes(s)||(c.username||'').toLowerCase().includes(s))
+  );
+  renderQueue(filtered);
+}
+
+async function openCaseDetail(caseId) {
+  document.querySelectorAll('.queue-item').forEach(q=>q.classList.remove('selected'));
+  document.getElementById(`qi-${caseId}`)?.classList.add('selected');
+  const detail = document.getElementById('lawyerCaseDetail');
+  if (!detail) return;
+  detail.innerHTML = '<div class="text-center text-muted" style="padding:30px;"><i class="fa fa-spinner fa-spin"></i> Loading…</div>';
+
+  try {
+    const c = allCasesForQueue.find(x=>x.id===caseId);
+    if (!c) return;
+    const notes = await (await fetch(`/api/cases/${caseId}/notes`)).json();
+    const msgs  = await (await fetch(`/api/cases/${caseId}/messages`)).json();
+
+    detail.innerHTML = `
+      <div class="d-flex justify-between align-center mb-16">
+        <div>
+          <div style="font-size:16px;font-weight:800;">${esc(c.title)}</div>
+          <div style="font-size:11px;color:var(--txt-muted);margin-top:3px;">Case #${c.id} · Client: ${esc(c.username||'?')} · ${fmtDate(c.created)}</div>
+        </div>
+        <div class="d-flex gap-8">
+          ${riskBadge(c.risk_level)} ${statusBadge(c.status)}
+        </div>
+      </div>
+
+      <div class="d-flex gap-8 mb-16" style="flex-wrap:wrap;">
+        <span class="badge badge-blue"><i class="fa fa-tag"></i> ${fmtCat(c.category)}</span>
+        <span class="badge badge-gray">Win: ${c.outcome_prob||'?'}%</span>
+      </div>
+
+      <div class="card mb-16" style="padding:14px;font-size:13px;color:var(--txt-muted);line-height:1.6;">${esc(c.description)}</div>
+
+      <div class="d-flex gap-8 mb-16">
+        <button class="btn btn-success btn-sm" onclick="updateCaseStatus(${caseId},'reviewed')"><i class="fa fa-check"></i> Mark Reviewed</button>
+        <button class="btn btn-ghost btn-sm" onclick="updateCaseStatus(${caseId},'closed')"><i class="fa fa-archive"></i> Close Case</button>
+        <button class="btn btn-ghost btn-sm" onclick="downloadNotice(${caseId})"><i class="fa fa-download"></i> Notice</button>
+      </div>
+      <hr>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">📝 Add Note</div>
+      <div class="d-flex gap-8 mb-16">
+        <input type="text" class="form-control" id="noteInput-${caseId}" placeholder="Add a professional note about this case…" style="flex:1;">
+        <button class="btn btn-primary btn-sm" onclick="addNote(${caseId})">Add</button>
+      </div>
+      ${notes.length ? `
+        <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Previous Notes</div>
+        ${notes.map(n=>`<div class="note-card"><div class="note-meta"><i class="fa fa-user-tie"></i> ${esc(n.lawyer_name)} · ${fmtDate(n.created)}</div><div class="note-text">${esc(n.note)}</div></div>`).join('')}
+      ` : ''}
+      ${msgs.length ? `
+        <hr>
+        <div style="font-size:12px;font-weight:700;color:var(--txt-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Messages</div>
+        ${msgs.map(m=>`<div class="log-item"><div class="log-meta"><span>${esc(m.sender)}</span><span>${fmtDate(m.created)}</span></div><div class="log-q">${esc(m.content)}</div></div>`).join('')}
+      ` : ''}
+    `;
+  } catch {
+    detail.innerHTML = '<div class="alert alert-danger">Error loading case details.</div>';
+  }
+}
+
+async function updateCaseStatus(caseId, status) {
+  const res = await fetch(`/api/cases/${caseId}/status`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status})
+  });
+  const d = await res.json();
+  if (d.ok) { loadLawyerQueue(); document.getElementById('lawyerCaseDetail').innerHTML='<div class="empty-state"><i class="fa fa-check-circle text-green"></i><p>Status updated. Select another case.</p></div>'; }
+}
+
+async function addNote(caseId) {
+  const input = document.getElementById(`noteInput-${caseId}`);
+  const note = input?.value.trim();
+  if (!note) return;
+  const res = await fetch(`/api/cases/${caseId}/notes`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({note})
+  });
+  const d = await res.json();
+  if (d.ok) { input.value=''; openCaseDetail(caseId); loadLawyerStats(); }
+}
+
+async function loadLawyerAppts() {
+  try {
+    const data = await (await fetch('/api/appointments')).json();
+    const tbody = document.getElementById('lawyerApptBody');
+    if (!tbody) return;
+    if (!data.length) { tbody.innerHTML='<tr><td colspan="7" class="text-center text-muted" style="padding:30px;">No appointment requests.</td></tr>'; return; }
+    tbody.innerHTML = data.map((a,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${esc(a.client_name||'?')}</strong></td>
+        <td>${fmtCat(a.category)}</td>
+        <td>${esc(a.note||'—')}</td>
+        <td>${statusBadge(a.status)}</td>
+        <td>${fmtDate(a.created)}</td>
+        <td>
+          ${a.status==='requested'?`
+            <button class="btn btn-xs btn-success" onclick="updateApptStatus(${a.id},'accepted',this)"><i class="fa fa-check"></i> Accept</button>
+            <button class="btn btn-xs btn-danger" onclick="updateApptStatus(${a.id},'declined',this)" style="margin-left:4px;"><i class="fa fa-times"></i> Decline</button>
+          `:a.status==='accepted'?`
+            <button class="btn btn-xs btn-ghost" onclick="updateApptStatus(${a.id},'completed',this)"><i class="fa fa-flag-checkered"></i> Done</button>
+          `:'—'}
+        </td>
+      </tr>
+    `).join('');
+  } catch {}
+}
+
+async function updateApptStatus(id, status, btn) {
+  btn.disabled = true;
+  const res = await fetch(`/api/appointments/${id}/status`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status})
+  });
+  const d = await res.json();
+  if (d.ok) loadLawyerAppts();
+  else btn.disabled = false;
+}
+
+async function loadMyNotes() {
+  try {
+    const notes = await (await fetch('/api/lawyer/my_notes')).json();
+    const el = document.getElementById('myNotesList');
+    if (!el) return;
+    if (!notes.length) { el.innerHTML='<div class="empty-state"><i class="fa fa-sticky-note"></i><p>No notes added yet. Open a case in the Case Queue to add notes.</p></div>'; return; }
+    el.innerHTML = notes.map(n => `
+      <div class="note-card">
+        <div class="note-meta">
+          <span><i class="fa fa-briefcase"></i> Case: <strong>${esc(n.case_title)}</strong></span>
+          <span style="float:right;">${fmtDate(n.created)}</span>
+          <span class="badge badge-blue" style="margin-left:8px;">${fmtCat(n.case_category)}</span>
+        </div>
+        <div class="note-text">${esc(n.note)}</div>
+      </div>
+    `).join('');
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ADMIN CHATBOT
+// ═══════════════════════════════════════════════════════════
+async function adminSend(prefill) {
+  const input = document.getElementById('adminChatInput');
+  const text  = prefill || input?.value.trim();
+  if (!text) return;
+  if (input) input.value = '';
+  appendMsg('adminChatMsgs', 'user', text);
+  const typing = appendTyping('adminChatMsgs');
+  try {
+    const d = await fetchAnalyze(text);
+    typing?.remove();
+    appendMsg('adminChatMsgs', 'ai', d.message || '⚠️ Error');
+  } catch {
+    typing?.remove();
+    appendMsg('adminChatMsgs', 'ai', '⚠️ Server error.');
+  }
+}
+
+// ─── ADMIN DATA LOADERS ──────────────────────────────────
+async function loadAdminHome() {
+  if (ROLE !== 'admin') return;
+  try {
+    const d = await (await fetch('/api/admin/stats')).json();
+    [['as-users','total_users'],['as-cases','total_cases'],['as-pending','pending_cases'],
+     ['as-chats','total_chats'],['as-clients','clients'],['as-lawyers','lawyers'],
+     ['as-admins','admins'],['as-cbms','chatbot_managers']].forEach(([id,key]) => {
+       const el = document.getElementById(id);
+       if (el) animateCount(el, d[key]||0);
+     });
+  } catch {}
+  loadActivity();
+}
+
+async function loadActivity() {
+  const el = document.getElementById('activityFeed');
+  if (!el) return;
+  try {
+    const data = await (await fetch('/api/admin/activity')).json();
+    if (!data.length) { el.innerHTML='<div class="text-muted text-center" style="font-size:12px;padding:20px;">No activity yet.</div>'; return; }
+    const icons = {'case_submitted':'fa-folder-plus blue','appointment':'fa-calendar-plus cyan','chat_query':'fa-comment purple'};
+    el.innerHTML = data.map(a => {
+      const [ico, col] = (icons[a.type]||'fa-circle gray').split(' ');
+      return `<div class="activity-item">
+        <div class="activity-icon ${col}" style="background:rgba(59,130,246,0.1)"><i class="fa ${ico}"></i></div>
+        <div class="activity-body">
+          <div class="activity-text"><strong>${esc(a.username)}</strong> — ${esc(a.detail)}</div>
+          <div class="activity-meta">${a.type.replace('_',' ')} · ${fmtDate(a.created)} ${a.status?'· '+a.status:''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch { if(el) el.innerHTML='<div class="alert alert-danger">Error loading activity.</div>'; }
+}
+
+let allUsers = [];
+async function loadAdminUsers() {
+  try {
+    allUsers = await (await fetch('/api/admin/users')).json();
+    renderUsers(allUsers);
+  } catch {}
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('adminUsersBody');
+  if (!tbody) return;
+  if (!users.length) { tbody.innerHTML='<tr><td colspan="5" class="text-center text-muted" style="padding:30px;">No users found.</td></tr>'; return; }
+  const roleColors = {admin:'badge-gold',lawyer:'badge-green',client:'badge-blue',chatbot_manager:'badge-purple'};
+  tbody.innerHTML = users.map((u,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${esc(u.username)}</strong></td>
+      <td><span class="badge ${roleColors[u.role]||'badge-gray'}">${esc(u.role)}</span></td>
+      <td>${fmtDate(u.created)}</td>
+      <td>
+        <select class="form-control form-control-sm" onchange="changeRole(${u.id},this.value,this)" style="width:130px;font-size:11px;display:inline-block;">
+          ${['client','lawyer','admin','chatbot_manager'].map(r=>`<option value="${r}"${u.role===r?' selected':''}>${r}</option>`).join('')}
+        </select>
+        <button class="btn btn-xs btn-danger" onclick="deleteUser(${u.id},this)" style="margin-left:6px;"><i class="fa fa-trash"></i></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers() {
+  const s = (document.getElementById('userSearch')?.value||'').toLowerCase();
+  const r = document.getElementById('userRoleFilter')?.value||'';
+  renderUsers(allUsers.filter(u => (!s||u.username.toLowerCase().includes(s))&&(!r||u.role===r)));
+}
+
+async function changeRole(uid, role, sel) {
+  if (!confirm(`Change role to ${role}?`)) { loadAdminUsers(); return; }
+  const res = await fetch(`/api/admin/users/${uid}/role`, {
+    method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({role})
+  });
+  const d = await res.json();
+  if (!d.ok) alert(d.msg||'Error'); loadAdminUsers();
+}
+
+async function deleteUser(uid, btn) {
+  if (!confirm('Delete this user? This cannot be undone.')) return;
+  btn.disabled = true;
+  const d = await (await fetch(`/api/admin/users/${uid}`, {method:'DELETE'})).json();
+  if (d.ok) loadAdminUsers(); else { alert(d.msg||'Error'); btn.disabled=false; }
+}
+
+let allAdminCases = [];
+async function loadAllCases() {
+  try {
+    allAdminCases = await (await fetch('/api/cases')).json();
+    renderAllCases(allAdminCases);
+  } catch {}
+}
+
+function renderAllCases(cases) {
+  const tbody = document.getElementById('allCasesBody');
+  if (!tbody) return;
+  if (!cases.length) { tbody.innerHTML='<tr><td colspan="8" class="text-center text-muted" style="padding:30px;">No cases found.</td></tr>'; return; }
+  tbody.innerHTML = cases.map((c,i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${esc(c.username||'?')}</strong></td>
+      <td>${esc(c.title)}</td>
+      <td>${fmtCat(c.category)}</td>
+      <td>${riskBadge(c.risk_level)}</td>
+      <td>${c.outcome_prob||'?'}%</td>
+      <td>${statusBadge(c.status)}</td>
+      <td>${fmtDate(c.created)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterAllCases() {
+  const s = (document.getElementById('acSearch')?.value||'').toLowerCase();
+  const f = document.getElementById('acFilter')?.value||'';
+  renderAllCases(allAdminCases.filter(c => (!f||c.status===f)&&(!s||(c.title||'').toLowerCase().includes(s)||(c.username||'').toLowerCase().includes(s))));
+}
+
+async function loadAdminLogs() {
+  const el = document.getElementById('adminLogsContainer');
+  if (!el) return;
+  try {
+    const logs = await (await fetch('/api/admin/chatbot_logs')).json();
+    if (!logs.length) { el.innerHTML='<div class="empty-state"><i class="fa fa-comment-slash"></i><p>No logs yet.</p></div>'; return; }
+    el.innerHTML = logs.map(l => `
+      <div class="log-item">
+        <div class="log-meta">
+          <span><i class="fa fa-user"></i> ${esc(l.username)} &nbsp;|&nbsp; <span class="badge ${l.used_ai?'badge-purple':'badge-green'}">${l.used_ai?'AI':'Rule-Based'}</span> &nbsp;|&nbsp; ${fmtCat(l.category)}</span>
+          <span>${fmtDate(l.created)}</span>
+        </div>
+        <div class="log-q">Q: ${esc(l.query)}</div>
+        <div class="log-r">A: ${esc(l.response.replace(/<[^>]+>/g,''))}</div>
+      </div>
+    `).join('');
+  } catch { el.innerHTML='<div class="alert alert-danger">Error loading logs.</div>'; }
+}
+
+async function createUser() {
+  const u = document.getElementById('cu-username')?.value.trim();
+  const p = document.getElementById('cu-password')?.value.trim();
+  const r = document.getElementById('cu-role')?.value;
+  if (!u||!p) { showMsg('cu-msg','Username and password required.','danger'); return; }
+  const res = await fetch('/api/admin/create_user', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({username:u,password:p,role:r})
+  });
+  const d = await res.json();
+  if (d.ok) {
+    showMsg('cu-msg',`✅ User "${u}" created as ${r}.`,'success');
+    document.getElementById('cu-username').value='';
+    document.getElementById('cu-password').value='';
+    loadAdminUsers(); loadAdminHome();
+  } else { showMsg('cu-msg', d.msg||'Error', 'danger'); }
+}
+
+async function loadSettings() {
+  try {
+    const cfg = await (await fetch('/api/admin/config')).json();
+    const ce = document.getElementById('cfg-chatbot-enabled'); if(ce) ce.checked = cfg.chatbot_enabled==='1';
+    const mc = document.getElementById('cfg-max-cases'); if(mc) mc.value = cfg.max_cases_per_client||'50';
+    const pn = document.getElementById('cfg-platform-name'); if(pn) pn.value = cfg.platform_name||'LexAI';
+  } catch {}
+}
+
+async function saveCfg(key, val) {
+  const res = await fetch('/api/admin/config', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({[key]:val})
+  });
+  const d = await res.json();
+  showMsg('cfg-msg', d.ok ? '✅ Saved' : '❌ Error', d.ok?'success':'danger');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CBM CHATBOT (Test)
+// ═══════════════════════════════════════════════════════════
+async function cbmTestSend(prefill) {
+  const input = document.getElementById('cbmTestInput');
+  const text  = prefill || input?.value.trim();
+  if (!text) return;
+  if (input) input.value = '';
+  appendMsg('cbmTestMsgs', 'user', text);
+  const typing = appendTyping('cbmTestMsgs');
+  try {
+    const d = await fetchAnalyze(text);
+    typing?.remove();
+    appendMsg('cbmTestMsgs', 'ai', d.message || '⚠️ Error');
+    const info = document.getElementById('cbmTestInfo');
+    if (info) info.innerHTML = `
+      <div style="font-size:11px;line-height:2;color:var(--txt-muted);">
+        <div>Engine: <strong style="color:${d.used_ai?'var(--purple)':'var(--green)'};">${d.used_ai?'Mistral AI':'Rule-Based/ML'}</strong></div>
+        ${d.has_ml?`
+          <div>Category: <strong style="color:var(--accent);">${fmtCat(d.category)}</strong> (${d.cat_confidence}%)</div>
+          <div>Risk: <strong>${d.risk_level}</strong> (${d.risk_confidence}%)</div>
+          <div>Win Prob: <strong style="color:var(--green);">${d.win_probability}%</strong></div>
+        `:''}</div>`;
+  } catch {
+    typing?.remove();
+    appendMsg('cbmTestMsgs', 'ai', '⚠️ Error');
+  }
+}
+
+// ─── CBM DATA LOADERS ─────────────────────────────────────
+async function loadCbmStats() {
+  if (ROLE !== 'chatbot_manager') return;
+  try {
+    const d = await (await fetch('/api/chatbot/stats')).json();
+    [['cbm-total','total_queries'],['cbm-ai','ai_used'],['cbm-rule','rule_based'],
+     ['cbm-7d','queries_7d'],['cbm-intents-home','active_intents']].forEach(([id,k])=>{
+       const el=document.getElementById(id); if(el) animateCount(el, d[k]||0);
+     });
+    // home bar chart
+    const bars = document.getElementById('homeBarChart');
+    if (bars && d.top_categories?.length) {
+      const max = Math.max(...d.top_categories.map(c=>c.cnt));
+      bars.innerHTML = d.top_categories.map(c=>`
+        <div class="bar-row">
+          <div class="bar-label">${fmtCat(c.category)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(c.cnt/max*100).toFixed(0)}%"></div></div>
+          <div class="bar-count">${c.cnt}</div>
+        </div>
+      `).join('');
+    }
+  } catch {}
+}
+
+let allIntents = [];
+async function loadIntents() {
+  try {
+    allIntents = await (await fetch('/api/chatbot/intents')).json();
+    renderIntents(allIntents);
+    const badge = document.getElementById('intentCountBadge');
+    if (badge) badge.textContent = `${allIntents.filter(i=>i.active).length} active`;
+  } catch {}
+}
+
+function renderIntents(intents) {
+  const el = document.getElementById('intentListContainer');
+  if (!el) return;
+  if (!intents.length) { el.innerHTML='<div class="empty-state"><i class="fa fa-brain"></i><p>No custom intents yet.</p></div>'; return; }
+  el.innerHTML = intents.map(i => `
+    <div class="intent-card">
+      <div class="intent-toggle">
+        <label class="toggle-sw">
+          <input type="checkbox" ${i.active?'checked':''} onchange="toggleIntent(${i.id}, this)">
+          <span class="toggle-sl"></span>
+        </label>
+      </div>
+      <div class="intent-body">
+        <div class="intent-trigger"><i class="fa fa-key"></i> ${esc(i.trigger)}</div>
+        <div class="intent-preview">${esc(i.response.replace(/<[^>]+>/g,''))}</div>
+        <div style="margin-top:5px;"><span class="badge badge-blue" style="font-size:9px;">${fmtCat(i.category)}</span></div>
+      </div>
+      <div class="intent-actions">
+        <button class="btn btn-xs btn-danger" onclick="deleteIntent(${i.id},this)"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function searchIntents() {
+  const s = (document.getElementById('intentSearch')?.value||'').toLowerCase();
+  renderIntents(allIntents.filter(i => i.trigger.includes(s)||fmtCat(i.category).toLowerCase().includes(s)));
+}
+
+async function addIntent() {
+  const trigger  = document.getElementById('intentTrigger')?.value.trim();
+  const response = document.getElementById('intentResponse')?.value.trim();
+  const category = document.getElementById('intentCategory')?.value;
+  if (!trigger||!response) { showMsg('intentMsg','Trigger and response are required.','danger'); return; }
+  const res = await fetch('/api/chatbot/intents', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({trigger,response,category})
+  });
+  const d = await res.json();
+  if (d.ok) {
+    showMsg('intentMsg','✅ Intent added!','success');
+    document.getElementById('intentTrigger').value='';
+    document.getElementById('intentResponse').value='';
+    loadIntents();
+  } else showMsg('intentMsg', d.msg||'Error', 'danger');
+}
+
+async function toggleIntent(id, el) {
+  const res = await fetch(`/api/chatbot/intents/${id}/toggle`, {method:'PATCH'});
+  const d = await res.json();
+  if (!d.ok) { el.checked=!el.checked; alert('Error toggling intent.'); }
+  else loadIntents();
+}
+
+async function deleteIntent(id, btn) {
+  if (!confirm('Delete this intent?')) return;
+  btn.disabled = true;
+  const d = await (await fetch(`/api/chatbot/intents/${id}`, {method:'DELETE'})).json();
+  if (d.ok) loadIntents(); else btn.disabled=false;
+}
+
+async function bulkAddIntents() {
+  const raw = document.getElementById('bulkJson')?.value.trim();
+  if (!raw) return;
+  try {
+    const intents = JSON.parse(raw);
+    const res = await fetch('/api/chatbot/bulk_intents', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({intents})
+    });
+    const d = await res.json();
+    showMsg('bulkMsg', d.ok ? `✅ ${d.added} intents added!` : d.msg, d.ok?'success':'danger');
+    if (d.ok) { document.getElementById('bulkJson').value=''; loadIntents(); }
+  } catch(e) { showMsg('bulkMsg','❌ Invalid JSON format.','danger'); }
+}
+
+async function loadCbmLogs() {
+  const el = document.getElementById('cbmLogsContainer');
+  if (!el) return;
+  const cat = document.getElementById('logCatFilter')?.value||'';
+  try {
+    const logs = await (await fetch('/api/admin/chatbot_logs?limit=100')).json();
+    const filtered = cat ? logs.filter(l=>l.category===cat) : logs;
+    if (!filtered.length) { el.innerHTML='<div class="empty-state"><i class="fa fa-inbox"></i><p>No logs found.</p></div>'; return; }
+    el.innerHTML = filtered.map(l=>`
+      <div class="log-item">
+        <div class="log-meta">
+          <span><i class="fa fa-user"></i> <strong>${esc(l.username)}</strong> &nbsp;|&nbsp; <span class="badge ${l.used_ai?'badge-purple':'badge-green'}">${l.used_ai?'Mistral AI':'Rule-Based'}</span>${l.category?` &nbsp;|&nbsp; ${fmtCat(l.category)}`:''}${l.risk_level?` &nbsp;|&nbsp; ${riskBadge(l.risk_level)}`:''}</span>
+          <span>${fmtDate(l.created)}</span>
+        </div>
+        <div class="log-q">Q: ${esc(l.query)}</div>
+        <div class="log-r">A: ${esc(l.response.replace(/<[^>]+>/g,''))}</div>
+      </div>
+    `).join('');
+  } catch { el.innerHTML='<div class="alert alert-danger">Error loading logs.</div>'; }
+}
+
+async function loadAnalytics() {
+  try {
+    const d = await (await fetch('/api/chatbot/stats')).json();
+    [['an-total','total_queries'],['an-ai','ai_used'],['an-rule','rule_based']].forEach(([id,k])=>{
+      const el=document.getElementById(id); if(el) animateCount(el, d[k]||0);
+    });
+    const pct=document.getElementById('an-pct'); if(pct) { pct.textContent=d.ai_percent+'%'; }
+    const rate=document.getElementById('an-rate'); if(rate) rate.textContent=d.ai_percent+'%';
+    const intEl=document.getElementById('an-intents'); if(intEl) intEl.textContent=d.active_intents;
+    const d7=document.getElementById('an-7d'); if(d7) d7.textContent=d.queries_7d;
+    const bars=document.getElementById('analyticsBars');
+    if (bars && d.top_categories?.length) {
+      const max=Math.max(...d.top_categories.map(c=>c.cnt));
+      bars.innerHTML=d.top_categories.map(c=>`
+        <div class="bar-row">
+          <div class="bar-label">${fmtCat(c.category)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${(c.cnt/max*100).toFixed(0)}%"></div></div>
+          <div class="bar-count">${c.cnt}</div>
+        </div>
+      `).join('');
+    } else if (bars) bars.innerHTML='<div class="text-muted text-center" style="font-size:12px;">No data yet. Data appears after chatbot queries are made.</div>';
+  } catch {}
+}
+
+async function loadCbmConfig() {
+  try {
+    const cfg = await (await fetch('/api/admin/config')).json();
+    const ce = document.getElementById('cbm-chatbot-enabled'); if(ce) ce.checked=cfg.chatbot_enabled==='1';
+  } catch {}
+}
+
+async function saveCbmCfg(key, val) {
+  const res = await fetch('/api/admin/config', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({[key]:val})
+  });
+  const d = await res.json();
+  showMsg('cbm-cfg-msg', d.ok ? '✅ Config saved' : '❌ Error', d.ok?'success':'danger');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════════
+async function loadProfileData() {
+  try {
+    const d = await (await fetch('/api/me')).json();
+    const nameEl  = document.getElementById('profileName');
+    const emailEl = document.getElementById('profileEmail');
+    if (nameEl  && d.full_name) nameEl.value  = d.full_name;
+    if (emailEl && d.email)     emailEl.value = d.email;
+    const dn = document.getElementById('profile-display-name'); if(dn) dn.textContent = d.full_name || d.username;
+    const de = document.getElementById('profile-display-email'); if(de) de.textContent = d.email || '';
+  } catch {}
+}
+
+async function updateProfile() {
+  const name  = document.getElementById('profileName')?.value.trim();
+  const email = document.getElementById('profileEmail')?.value.trim();
+  const res = await fetch('/api/profile/update', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({full_name:name, email:email})
+  });
+  const d = await res.json();
+  showMsg('profile-update-msg', d.ok ? '✅ Profile saved!' : '❌ '+d.msg, d.ok?'success':'danger');
+  if (d.ok) loadProfileData();
+}
+
+async function changePassword() {
+  const curr = document.getElementById('cpCurrent')?.value;
+  const newp  = document.getElementById('cpNew')?.value;
+  const conf  = document.getElementById('cpConfirm')?.value;
+  if (!curr||!newp) { showMsg('cp-msg','All fields required.','danger'); return; }
+  if (newp.length<6) { showMsg('cp-msg','New password must be at least 6 characters.','danger'); return; }
+  if (newp!==conf) { showMsg('cp-msg','Passwords do not match.','danger'); return; }
+  const res = await fetch('/api/change_password', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({current_password:curr, new_password:newp})
+  });
+  const d = await res.json();
+  if (d.ok) {
+    showMsg('cp-msg','✅ Password updated successfully!','success');
+    document.getElementById('cpCurrent').value='';
+    document.getElementById('cpNew').value='';
+    document.getElementById('cpConfirm').value='';
+  } else showMsg('cp-msg', d.msg||'Error changing password.', 'danger');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+(function init() {
+  if (ROLE==='client')          { loadClientStats(); }
+  if (ROLE==='lawyer')          { loadLawyerStats(); }
+  if (ROLE==='admin')           { loadAdminHome(); }
+  if (ROLE==='chatbot_manager') { loadCbmStats(); }
+})();
+</script>
+</body>
+</html>

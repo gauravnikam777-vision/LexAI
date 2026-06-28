@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>/* FOUC prevention */(function(){var t=localStorage.getItem('lexai-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}());</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LexAI – Sign In | Indian Legal Intelligence Platform</title>
+  <meta name="description" content="LexAI – AI-powered Indian Legal Assistant. Login to access your personalised legal dashboard.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg:      #0f172a;
+      --card:    #1e293b;
+      --el:      #263548;
+      --accent:  #3b82f6;
+      --gold:    #f59e0b;
+      --green:   #10b981;
+      --red:     #ef4444;
+      --txt:     #f1f5f9;
+      --muted:   #94a3b8;
+      --border:  rgba(255,255,255,0.07);
+    }
+    [data-theme="light"] {
+      --bg:     #f1f5f9;
+      --card:   #ffffff;
+      --el:     #e8edf5;
+      --txt:    #0f172a;
+      --muted:  #475569;
+      --border: rgba(0,0,0,0.09);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+
+    /* Animated background blobs */
+    .blob {
+      position: fixed; border-radius: 50%; opacity: 0.07;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+      animation: blobFloat 10s ease-in-out infinite alternate;
+    }
+    .blob-1 { width: 500px; height: 500px; background: #3b82f6; top: -100px; left: -100px; }
+    .blob-2 { width: 400px; height: 400px; background: #f59e0b; bottom: -80px; right: -80px; animation-delay: -4s; }
+    .blob-3 { width: 300px; height: 300px; background: #8b5cf6; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -2s; }
+    @keyframes blobFloat {
+      from { transform: scale(1) translate(0, 0); }
+      to   { transform: scale(1.08) translate(10px, 15px); }
+    }
+
+    .login-shell {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 480px 400px; gap: 0;
+      border-radius: 20px; overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+      min-height: 580px;
+    }
+
+    /* LEFT PANEL — branding */
+    .brand-side {
+      background: linear-gradient(145deg, #1e3a5f 0%, #0f172a 60%, #1e1b3a 100%);
+      padding: 50px 40px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      position: relative; overflow: hidden;
+    }
+    .brand-side::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 30% 60%, rgba(59,130,246,0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 20%, rgba(245,158,11,0.1) 0%, transparent 50%);
+    }
+    .brand-content { position: relative; z-index: 1; }
+    .brand-logo {
+      font-size: 32px; font-weight: 800;
+      background: linear-gradient(135deg, #58a6ff, #f59e0b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .brand-tagline { font-size: 13px; color: #94a3b8; margin-bottom: 36px; }
+
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.5;
+    }
+    .feature-list .fi {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0; margin-top: 2px;
+    }
+    .fi-blue   { background: rgba(59,130,246,0.2); }
+    .fi-gold   { background: rgba(245,158,11,0.2); }
+    .fi-green  { background: rgba(16,185,129,0.2); }
+    .fi-purple { background: rgba(139,92,246,0.2); }
+
+    .brand-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      position: relative; z-index: 1;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px; padding: 10px 14px; text-align: center;
+    }
+    .stat-pill .sp-num { font-size: 20px; font-weight: 800; color: #f1f5f9; }
+    .stat-pill .sp-lbl { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+    /* RIGHT PANEL — form */
+    .form-side {
+      background: var(--card);
+      padding: 40px 36px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .form-heading { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .form-subhead { font-size: 12px; color: var(--muted); margin-bottom: 28px; }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex; gap: 0; border-radius: 10px; overflow: hidden;
+      background: var(--el); margin-bottom: 24px;
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1; padding: 9px; font-size: 13px; font-weight: 600;
+      background: transparent; color: var(--muted);
+      border: none; cursor: pointer; transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab-btn.active { background: var(--accent); color: white; border-radius: 8px; }
+
+    /* Form fields */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .field input, .field select {
+      width: 100%; padding: 10px 12px; font-size: 13px;
+      background: var(--el); color: var(--txt);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'Inter', sans-serif; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+    .field input::placeholder { color: var(--muted); }
+
+    /* Buttons */
+    .submit-btn {
+      width: 100%; padding: 11px; border: none;
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      color: white; font-size: 14px; font-weight: 700;
+      border-radius: 10px; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s; margin-top: 4px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+    .submit-btn:disabled { opacity: 0.7; transform: none; cursor: not-allowed; }
+    .submit-btn.success { background: linear-gradient(135deg, var(--green), #059669); }
+
+    /* Alerts */
+    .alert {
+      padding: 9px 12px; border-radius: 8px; font-size: 12px;
+      margin-top: 10px; display: none;
+    }
+    .alert-danger  { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; }
+
+
+
+    /* Footer */
+    .login-footer {
+      position: fixed; bottom: 16px; left: 0; right: 0;
+      text-align: center; font-size: 11px; color: var(--muted);
+      z-index: 1;
+    }
+    .login-footer strong { color: var(--txt); }
+
+    /* Theme toggle in login */
+    .theme-toggle-login {
+      position: fixed; top: 16px; right: 16px; z-index: 10;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; cursor: pointer;
+      color: var(--muted); font-size: 13px;
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .theme-toggle-login:hover { color: var(--gold); border-color: var(--gold); }
+
+    /* Register note */
+    .reg-note {
+      font-size: 11px; color: var(--muted); margin-top: 12px;
+      background: var(--el); border: 1px dashed var(--border);
+      border-radius: 8px; padding: 9px 12px; line-height: 1.6;
+    }
+
+    /* Input with icon */
+    .input-wrap { position: relative; }
+    .input-wrap i {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 13px; pointer-events: none;
+    }
+    .input-wrap input { padding-left: 32px; }
+
+    /* Mobile */
+    @media (max-width: 860px) {
+      .login-shell { grid-template-columns: 1fr; min-width: 340px; }
+      .brand-side { display: none; }
+      .form-side { border-radius: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- Theme toggle -->
+<button class="theme-toggle-login" onclick="toggleLoginTheme()">
+  <i id="loginThemeIcon" class="fa fa-moon"></i>
+  <span id="loginThemeLabel">Dark</span>
+</button>
+
+<div class="login-shell">
+
+  <!-- LEFT: Brand / Features -->
+  <div class="brand-side">
+    <div class="brand-content">
+      <div class="brand-logo">⚖️ LexAI</div>
+      <div class="brand-tagline">AI-Powered Indian Legal Intelligence System</div>
+
+      <ul class="feature-list">
+        <li>
+          <div class="fi fi-blue">🤖</div>
+          <div><strong>Mistral AI + ML Analysis</strong><br>TF-IDF + RandomForest classifies your case category, risk level and win probability.</div>
+        </li>
+        <li>
+          <div class="fi fi-gold">📁</div>
+          <div><strong>Chatbot-Driven Case System</strong><br>Submit cases, book appointments, and get legal advice entirely from the chatbot interface.</div>
+        </li>
+        <li>
+          <div class="fi fi-green">⚖️</div>
+          <div><strong>IPC / BNS 2023 Ready</strong><br>Covers 35+ Indian legal areas including Criminal, Property, Labour, Family and Cyber Law.</div>
+        </li>
+        <li>
+          <div class="fi fi-purple">🛡️</div>
+          <div><strong>4 Role-Based Dashboards</strong><br>Separate dashboards for Client, Lawyer, Admin and Chatbot Manager with full RBAC.</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="brand-stats">
+      <div class="stat-pill"><div class="sp-num">35+</div><div class="sp-lbl">Legal Areas</div></div>
+      <div class="stat-pill"><div class="sp-num">4</div><div class="sp-lbl">Actor Roles</div></div>
+      <div class="stat-pill"><div class="sp-num">ML</div><div class="sp-lbl">Powered</div></div>
+      <div class="stat-pill"><div class="sp-num">24×7</div><div class="sp-lbl">AI Advisor</div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Form -->
+  <div class="form-side">
+    <div class="form-heading">Welcome Back</div>
+    <div class="form-subhead">Sign in to your LexAI dashboard</div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')"><i class="fa fa-sign-in-alt"></i> Sign In</button>
+      <button class="tab-btn" id="tabReg" onclick="switchTab('register')"><i class="fa fa-user-plus"></i> Register</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginPanel">
+      <div class="field">
+        <label>Username</label>
+        <div class="input-wrap">
+          <i class="fa fa-user"></i>
+          <input type="text" id="loginUser" placeholder="Enter your username" autocomplete="username">
+        </div>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="loginPass" placeholder="Enter your password" autocomplete="current-password">
+        </div>
+      </div>
+
+      <button class="submit-btn" id="loginBtn" onclick="doLogin()">
+        <i class="fa fa-sign-in-alt"></i> Sign In to Dashboard
+      </button>
+      <div id="loginErr" class="alert alert-danger"></div>
+
+
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerPanel" style="display:none;">
+      <div class="field">
+        <label>Username (min 3 chars)</label>
+        <div class="input-wrap">
+          <i class="fa fa-user"></i>
+          <input type="text" id="regUser" placeholder="Choose a username" autocomplete="username">
+        </div>
+      </div>
+      <div class="field">
+        <label>Password (min 6 chars)</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="regPass" placeholder="Create a password" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="field">
+        <label>I am a…</label>
+        <select id="regRole">
+          <option value="client">👤 Client — seeking legal assistance</option>
+          <option value="lawyer">⚖️ Lawyer — providing legal services</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" id="regBtn" onclick="doRegister()">
+        <i class="fa fa-user-plus"></i> Create Account
+      </button>
+      <div id="regErr" class="alert alert-danger"></div>
+      <div id="regOk"  class="alert alert-success"></div>
+
+      <div class="reg-note">
+        ℹ️ <strong>Admin</strong> and <strong>Chatbot Manager</strong> accounts are created by the Administrator only.
+        Self-registration is available for Clients and Lawyers.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="login-footer">
+  <strong>LexAI</strong> &mdash; MCA Final Year Project 2026 &mdash; Gaurav Govind Nikam &copy; 2026
+</div>
+
+<script>
+  // Theme
+  function toggleLoginTheme() {
+    const html = document.documentElement;
+    const curr = html.getAttribute('data-theme') || 'dark';
+    const next = curr === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('lexai-theme', next);
+    document.getElementById('loginThemeIcon').className = next === 'dark' ? 'fa fa-moon' : 'fa fa-sun';
+    document.getElementById('loginThemeLabel').textContent = next === 'dark' ? 'Dark' : 'Light';
+  }
+  // Set correct icon on load
+  (function(){
+    const t = localStorage.getItem('lexai-theme') || 'dark';
+    document.getElementById('loginThemeIcon').className = t === 'dark' ? 'fa fa-moon' : 'fa fa-sun';
+    document.getElementById('loginThemeLabel').textContent = t === 'dark' ? 'Dark' : 'Light';
+  })();
+
+  // Tab switch
+  function switchTab(tab) {
+    const toLogin = tab === 'login';
+    document.getElementById('loginPanel').style.display    = toLogin ? 'block' : 'none';
+    document.getElementById('registerPanel').style.display = toLogin ? 'none'  : 'block';
+    document.getElementById('tabLogin').classList.toggle('active', toLogin);
+    document.getElementById('tabReg').classList.toggle('active', !toLogin);
+  }
+
+
+
+  // Login
+  async function doLogin() {
+    const u   = document.getElementById('loginUser').value.trim();
+    const p   = document.getElementById('loginPass').value;
+    const err = document.getElementById('loginErr');
+    const btn = document.getElementById('loginBtn');
+    err.style.display = 'none';
+
+    if (!u || !p) {
+      err.textContent = 'Please enter username and password.';
+      err.style.display = 'block'; return;
+    }
+
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Signing in…';
+    btn.disabled  = true;
+
+    try {
+      const res  = await fetch('/login', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({username:u, password:p})
+      });
+      const data = await res.json();
+      if (data.ok) {
+        btn.innerHTML = '<i class="fa fa-check"></i> Redirecting…';
+        btn.classList.add('success');
+        window.location.href = '/dashboard';
+      } else {
+        err.textContent   = data.msg || 'Invalid username or password.';
+        err.style.display = 'block';
+        btn.innerHTML     = '<i class="fa fa-sign-in-alt"></i> Sign In to Dashboard';
+        btn.disabled      = false;
+      }
+    } catch {
+      err.textContent   = 'Server error. Please try again.';
+      err.style.display = 'block';
+      btn.innerHTML     = '<i class="fa fa-sign-in-alt"></i> Sign In to Dashboard';
+      btn.disabled      = false;
+    }
+  }
+
+  // Register
+  async function doRegister() {
+    const u    = document.getElementById('regUser').value.trim();
+    const p    = document.getElementById('regPass').value;
+    const role = document.getElementById('regRole').value;
+    const err  = document.getElementById('regErr');
+    const ok   = document.getElementById('regOk');
+    const btn  = document.getElementById('regBtn');
+    err.style.display = 'none'; ok.style.display = 'none';
+
+    if (!u || u.length < 3) {
+      err.textContent = 'Username must be at least 3 characters.';
+      err.style.display = 'block'; return;
+    }
+    if (!p || p.length < 6) {
+      err.textContent = 'Password must be at least 6 characters.';
+      err.style.display = 'block'; return;
+    }
+
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Creating…';
+    btn.disabled  = true;
+
+    try {
+      const res  = await fetch('/register', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({username:u, password:p, role:role})
+      });
+      const data = await res.json();
+      if (data.ok) {
+        ok.textContent   = '✅ Account created! Redirecting to sign in…';
+        ok.style.display = 'block';
+        setTimeout(() => switchTab('login'), 1400);
+      } else {
+        err.textContent   = data.msg || 'Registration failed.';
+        err.style.display = 'block';
+      }
+    } catch {
+      err.textContent   = 'Server error. Please try again.';
+      err.style.display = 'block';
+    }
+    btn.innerHTML = '<i class="fa fa-user-plus"></i> Create Account';
+    btn.disabled  = false;
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('loginPanel').style.display !== 'none') doLogin();
+      else doRegister();
+    }
+  });
+</script>
+</body>
+</html>
