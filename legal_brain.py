@@ -240,7 +240,7 @@ INTENTS = [
     {"kw":["senior citizen","parents neglect","son not supporting","elderly","parents thrown","maintenance parents","welfare parents act","old age","vridh"],"ans":lambda: SENIOR},
     {"kw":["child custody","bachche ki custody","custody of child","parental rights","children divorce","guardianship","minor child"],"ans":lambda: CUSTODY},
     {"kw":["theft","steal","chori","stolen","pick pocket","robbery","burglary","house break","mobile stolen","phone stolen"],"ans":lambda: THEFT},
-    {"kw":["murder","302","hatya","killing","homicide","life sentence","death penalty","accused murder","unnatural death"],"ans":lambda: MURDER},
+    {"kw":["murder","302","hatya","killing","homicide","life sentence","death penalty","accused murder","unnatural death","maar diya","khatam kar","khoon"],"ans":lambda: MURDER},
     {"kw":["cheating","420","fraud","ponzi","investment fraud","fake company","money fraud","swindled","financial fraud","insurance fraud","duped"],"ans":lambda: FRAUD_GENERAL},
     {"kw":["rti","right to information","information act","government documents","public authority","pio","first appeal"],"ans":lambda: RTI},
     {"kw":["writ","high court","supreme court","habeas corpus","mandamus","certiorari","prohibition","quo warranto","PIL","public interest","constitutional","fundamental rights","article 21","article 14","article 19"],"ans":lambda: CONSTITUTIONAL},
@@ -253,12 +253,13 @@ INTENTS = [
     {"kw":["nri","overseas indian","foreign return","nri property","nri dispute","poa holder","power of attorney fraud","nri rights","oci","pio","overseas citizen","living abroad","nri india property","nri case india"],"ans":lambda: NRI},
     {"kw":["land acquisition","government took land","sarkar ne zameen","compensation land","rfctlarr","la act","nhia","airport land","highway land","government land","compulsory acquisition","eminent domain","sarkar ne khet"],"ans":lambda: LAND_ACQ},
     {"kw":["passport","visa problem","travel document","passport office","passport not coming","tatkaal","ecr passport","police verification passport","passport renew","passport impound","passport stuck","passport delay","travel ban"],"ans":lambda: PASSPORT},
+    {"kw":["rape","balatkar","blaatkar","assault woman","outrage modesty","sexual assault","forcible sex","raped","rapist"],"ans":lambda: SEXUAL_ASSAULT},
 ]
 
 # Maps intent index → correct ML category (overrides inaccurate ML model predictions)
 INTENT_TO_CATEGORY = {
     0:  'motor_accident',      # hit_and_run
-    1:  'cyber_crime',         # cheque_bounce (wait, cheque bounce should be fraud or corporate_tax)
+    1:  'cyber_crime',         # cheque_bounce
     2:  'family',              # domestic_violence
     3:  'cyber_crime',         # cyber_crime
     4:  'family',              # divorce
@@ -273,7 +274,7 @@ INTENT_TO_CATEGORY = {
     13: 'property',            # property
     14: 'property',            # inheritance
     15: 'criminal',            # defamation
-    16: 'theft_robbery',       # extortion (or keep criminal) -> let's map to theft_robbery
+    16: 'theft_robbery',       # extortion
     17: 'constitutional',      # arrest_rights
     18: 'family',              # dowry
     19: 'family',              # senior_citizen
@@ -292,7 +293,13 @@ INTENT_TO_CATEGORY = {
     32: 'property',            # nri
     33: 'property',            # land_acquisition
     34: 'constitutional',      # passport
+    35: 'sexual_offense',      # sexual_assault
 }
+
+# Pre-normalize all keywords in INTENTS for maximum performance and matching accuracy
+for _intent in INTENTS:
+    _intent["norm_kw"] = [normalize(_kw) for _kw in _intent["kw"]]
+
 
 # ── Response Templates ─────────────────────────────────────────────────────────
 HIT_RUN = """🚗 <strong>Motor Vehicle Accident / Hit & Run — Complete Legal Guide</strong><br><br>
@@ -775,6 +782,18 @@ PASSPORT = """📘 <strong>Passport Issues — Legal Remedies & Steps</strong><b
 • Required: Annexure F + any one valid address proof<br><br>
 ⚖️ <strong>Laws:</strong> Passports Act 1967, RTI Act 2005, Constitution Art. 21 (Right to Travel)."""
 
+SEXUAL_ASSAULT = """🚨 <strong>Sexual Assault / Rape — Emergency Legal Guide</strong><br><br>
+🚨 <strong>EMERGENCY HELPLINES — CALL IMMEDIATELY:</strong><br>
+• <strong>Police Emergency: 112 / 100</strong><br>
+• <strong>National Women Helpline: 181 / 1091</strong> (24x7, Free, Confidential)<br><br>
+<strong>Crucial Steps for Victims and Witnesses:</strong><br>
+1. <strong>Do not change clothes or wash/bathe</strong> before the medical checkup — this preserves vital DNA and forensic evidence.<br>
+2. <strong>Go to the nearest Government Hospital</strong> immediately. Under Section 164A CrPC / Section 184 BNSS, a medical examination must be conducted within 24 hours of reporting.<br>
+3. <strong>File an FIR immediately</strong> under IPC Section 376 / BNS Section 63 (Rape). Police <em>cannot</em> refuse to register an FIR for sexual offenses.<br>
+4. <strong>Zero FIR</strong>: If the incident occurred elsewhere, you can register a Zero FIR at any police station, and they must transfer it to the correct jurisdiction.<br>
+5. <strong>Lady Police Officer</strong>: Under BNSS 173, the victim's statement must be recorded by a female police officer at the victim's residence or choice of place.<br><br>
+⚖️ <strong>Laws:</strong> IPC Section 375/376 | BNS Section 63/64, CrPC 164A | BNSS 184."""
+
 # ── Scoring engine ─────────────────────────────────────────────────────────────
 def score_intent(norm_text, keywords):
     score = 0
@@ -842,7 +861,7 @@ def get_rule_based_answer(text):
     # Score all intents — raise threshold to 3 to avoid weak false-positive matches
     best_score, best_ans, best_idx = 0, None, None
     for i, intent in enumerate(INTENTS):
-        s = score_intent(norm, intent["kw"])
+        s = score_intent(norm, intent["norm_kw"])
         if s > best_score:
             best_score, best_ans, best_idx = s, intent["ans"](), i
     if best_score >= 3:
@@ -882,6 +901,15 @@ def get_legal_response(user_text, context_intent_idx=None, conversation_history=
     # ── ALWAYS detect intent first (for ML category override) ───────────────────
     # Run rule-based scoring to get a base intent, but we rely on Mistral for chat.
     _, detected_intent_idx = get_rule_based_answer(user_text)
+
+    # Pre-classifier override for severe crimes to guarantee correct category mapping
+    # 35 = sexual_assault (sexual_offense), 22 = murder (criminal)
+    norm_for_override = normalize(user_text)
+    if any(w in norm_for_override for w in ['rape', 'balatkar', 'blaatkar', 'sexual assault', 'sex force']):
+        detected_intent_idx = 35
+    elif any(w in norm_for_override for w in ['murder', 'hatya', 'killing', 'homicide', 'maar diya', 'beat diya', 'khoon']):
+        if detected_intent_idx != 35: # sexual assault takes precedence if both are present
+            detected_intent_idx = 22
 
     # ── Mistral AI with full conversation history ───────────────────────────────
     if mistral_client:

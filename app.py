@@ -680,10 +680,13 @@ def ml_analyze(text):
         sims = cosine_similarity(vec, tfidf_matrix).flatten()
         top4 = sims.argsort()[-4:][::-1]
         for idx in top4:
-            if idx < len(case_records) and sims[idx] > 0.04:
+            # Raise threshold to 0.25 to avoid weak, unrelated matches
+            if idx < len(case_records) and sims[idx] > 0.25:
                 rec = case_records[idx]
-                if best_rag is None:
-                    best_rag = rec
+                # Only use RAG strategy if category aligns
+                if rec.get('category') == category:
+                    if best_rag is None:
+                        best_rag = rec
                 similar.append({
                     'case_id'   : rec.get('case_id', ''),
                     'text'      : rec.get('text', '')[:130] + '…',
@@ -710,6 +713,7 @@ def ml_analyze(text):
             'what_to_do'  : best_rag.get('what_to_do', ''),
             'how_to_do'   : how_to,
             'when_to_do'  : best_rag.get('when_to_do', ''),
+            'rag_category': best_rag.get('category', ''), # store for alignment checks
         }
 
     return {
@@ -1168,9 +1172,9 @@ def analyze():
     # ML results — always show if we have category prediction
     # (advanced_strategy how_to_do may be empty if dataset entry is bare)
     if ml_data and ml_data.get('category'):
-        # Build strategy: prefer RAG-matched dataset entry, else template
+        # Build strategy: prefer RAG-matched dataset entry (if categories align), else template
         adv = ml_data.get('advanced_strategy')
-        if adv and adv.get('how_to_do'):
+        if adv and adv.get('how_to_do') and adv.get('rag_category') == ml_data['category']:
             laws_raw = adv.get('ipc_sections', '')
             applicable_laws = [l.strip() for l in re.split(r'[|,]', laws_raw) if l.strip()]
             strategy = {
