@@ -1985,6 +1985,55 @@ const FACTS = [
   'Under BNSS 2023, police must immediately inform family/friend of any arrest.',
   'Section 125 CrPC → Women and children can get maintenance from Magistrate Court quickly.',
 ];
+
+const CATEGORY_FACTS = {
+  property: [
+    'Daughters have EQUAL rights in ancestral property under the 2005 amendment of the Hindu Succession Act.',
+    'Under RERA 2016, builders must pay interest to homebuyers for delayed flat possession.',
+    'Adverse possession in India requires continuous, uninterrupted, hostile land occupation for 12+ years.'
+  ],
+  labour: [
+    'Under the Payment of Wages Act, wages must be paid before the 7th of the following month for firms under 1000 employees.',
+    'The Maternity Benefit Act provides 26 weeks of paid leave to female employees.',
+    'Wrongful termination can be challenged in the Labour Court within 3 years.'
+  ],
+  fraud: [
+    'Cheque Bounce — you must send a Legal Demand Notice within 30 days of the bounce memo to the drawer.',
+    'PMLA 2002 allows attachment of property involved in money laundering cases.',
+    'Section 138 of the NI Act carries up to 2 years imprisonment or up to 2x the cheque amount in fine.'
+  ],
+  family: [
+    'Section 125 CrPC / Section 144 BNSS provides speedy maintenance to wives, children, and parents.',
+    'The DV Act 2005 allows women to file complaints against physical, mental, or financial abuse.',
+    'Mutual Consent Divorce requires a mandatory 6-month separation period (cooling-off).'
+  ],
+  consumer: [
+    'Consumer complaints up to ₹50 Lakhs can be filed FREE at edaakhil.nic.in.',
+    'The Consumer Protection Act 2019 allows filing complaints online from your place of residence.',
+    'Hospitals and doctors are liable under the Consumer Protection Act for gross medical negligence.'
+  ],
+  motor_accident: [
+    'The Motor Accident Claims Tribunal (MACT) does not have a strict time limit, but claims should be filed quickly.',
+    'The Solatium Fund Scheme provides compensation for victims of hit-and-run by unidentified vehicles.',
+    'In motor accident cases, third-party insurance is legally mandatory for all vehicles.'
+  ],
+  criminal: [
+    'Police MUST register an FIR for any cognizable offense under Section 154 CrPC / Section 173 BNSS.',
+    'Anticipatory Bail can be filed in Sessions Court or High Court even before an arrest is made.',
+    'The Witness Protection Scheme 2018 is a legal protection framework for witnesses facing threat.'
+  ],
+  sexual_offense: [
+    'Zero FIR — you can file an FIR for sexual offenses at ANY police station, regardless of jurisdiction.',
+    'Under the POCSO Act, a child\'s identity cannot be disclosed in media or court proceedings.',
+    'A rape victim\'s statement must be recorded by a female police officer at the victim\'s residence.'
+  ],
+  cyber_crime: [
+    'Cyber Crime Helpline: 1930. Call within 72 hours to freeze fraudulent transactions.',
+    'Register cyber fraud complaints online at cybercrime.gov.in immediately.',
+    'Do not share OTP, PIN, or CVV; bank officials will never ask for these details.'
+  ]
+};
+
 let factIdx = 0;
 function rotateFact() {
   const el = document.getElementById('legalFact');
@@ -2078,6 +2127,19 @@ function renderMlPanel(d, prefix) {
   if (lawsBox && laws.length) {
     lawsBox.style.display='block';
     setHtml(`${p}-laws`, laws.map(l=>`<span class="law-tag">${esc(l)}</span>`).join(''));
+  }
+
+  // Dynamically set category-aligned legal fact in "Did You Know?" box
+  const category = d.category || 'criminal';
+  const categoryFacts = CATEGORY_FACTS[category] || FACTS;
+  const randomFact = categoryFacts[Math.floor(Math.random() * categoryFacts.length)];
+  const factEl = document.getElementById('legalFact');
+  if (factEl && randomFact) {
+    factEl.style.opacity = 0;
+    setTimeout(() => {
+      factEl.innerHTML = `<strong>${fmtCat(category)} Fact:</strong> ${randomFact}`;
+      factEl.style.opacity = 1;
+    }, 300);
   }
 }
 
