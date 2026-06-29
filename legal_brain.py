@@ -226,7 +226,7 @@ INTENTS = [
     {"kw":["maintenance","nafqa","section 125","child support","wife maintenance","husband not paying","bnss 144","support money","guzara"],"ans":lambda: MAINTENANCE},
     {"kw":["bail","anticipatory bail","438","437","bail kaise","bail milega","get bail","bail chahiye","bailed out","bail application","custody","in jail","arrested"],"ans":lambda: BAIL},
     {"kw":["fir","police complaint","police refuse","first information report","zero fir","police nahi sun","police not registering","complaint police","darj fir","police nc"],"ans":lambda: FIR},
-    {"kw":["labour","job terminated","fired","wrongful termination","salary not paid","unpaid wages","notice period","retrenchment","industrial dispute","payment of wages","naukri gayi","naukri se nikala","boss ne nikala"],"ans":lambda: LABOUR},
+    {"kw":["labour","job terminated","fired","wrongful termination","salary not paid","unpaid wages","notice period","retrenchment","industrial dispute","payment of wages","naukri gayi","naukri se nikala","boss ne nikala","salary nahi","salary not given","salary pending","unpaid salary"],"ans":lambda: LABOUR},
     {"kw":["sexual harassment","posh","workplace harassment","office mein","boss harassing","colleague harassing","inappropriate touch","icc","internal complaint"],"ans":lambda: POSH},
     {"kw":["provident fund","pf fraud","epf","pf nahi jama","epfo","pf deducted","pf not deposited"],"ans":lambda: PF},
     {"kw":["consumer complaint","defective product","refund nahi","warranty","service deficiency","amazon","flipkart","company cheated","online shopping","product damage","e commerce fraud","edaakhil","consumer forum","ncdrc"],"ans":lambda: CONSUMER},
@@ -796,22 +796,29 @@ SEXUAL_ASSAULT = """🚨 <strong>Sexual Assault / Rape — Emergency Legal Guide
 
 # ── Scoring engine ─────────────────────────────────────────────────────────────
 def score_intent(norm_text, keywords):
-    score = 0
+    best_score = 0
     tokens = set(norm_text.split())
-    stop_words = {'in', 'the', 'by', 'of', 'and', 'or', 'a', 'an', 'to', 'for', 'with', 'on', 'at', 'from'}
+    stop_words = {
+        'in', 'the', 'by', 'of', 'and', 'or', 'a', 'an', 'to', 'for', 'with', 'on', 'at', 'from',
+        'ke', 'se', 'ki', 'ka', 'ko', 'ne', 'mein', 'me', 'pe', 'par', 'aur', 'sath', 'saath', 'satha',
+        'kisi', 'usi', 'tha', 'thi', 'the', 'hai', 'hain', 'ho', 'hua', 'huye', 'gaya', 'gayi',
+    }
     for kw in keywords:
+        kw_score = 0
         kw_words = kw.split()
         if kw in norm_text:
-            score += len(kw_words) * 5    # exact phrase = highest score
+            kw_score = len(kw_words) * 5    # exact phrase = highest score
         elif all(w in tokens for w in kw_words):
-            score += len(kw_words) * 3    # all words present anywhere in text
+            kw_score = len(kw_words) * 3    # all words present anywhere in text
         else:
-            # Only give partial points if a meaningful word matches
             meaningful_words = [w for w in kw_words if w not in stop_words]
-            matched = [w for w in meaningful_words if w in tokens]
-            if matched:
-                score += len(matched)     # 1 point per meaningful word matched
-    return score
+            if meaningful_words:
+                matched = [w for w in meaningful_words if w in tokens]
+                if matched:
+                    kw_score = len(matched)     # 1 point per meaningful word matched
+        if kw_score > best_score:
+            best_score = kw_score
+    return best_score
 
 # ── Follow-up / Continuation Query Detection ────────────────────────────────────
 # These are words that appear in follow-up messages and have NO legal topic meaning.
@@ -858,15 +865,45 @@ def get_rule_based_answer(text):
     sec_ans = lookup_section(norm)
     if sec_ans:
         return sec_ans, None
-    # Score all intents — raise threshold to 3 to avoid weak false-positive matches
-    best_score, best_ans, best_idx = 0, None, None
+        
+    matches = []
     for i, intent in enumerate(INTENTS):
         s = score_intent(norm, intent["norm_kw"])
-        if s > best_score:
-            best_score, best_ans, best_idx = s, intent["ans"](), i
-    if best_score >= 3:
-        return best_ans, best_idx
-    return None, None
+        if s >= 3:
+            matches.append((s, intent["ans"](), i))
+            
+    if not matches:
+        return None, None
+        
+    # Sort matches by score descending
+    matches.sort(key=lambda x: x[0], reverse=True)
+    
+    # If there is only one match, return it directly
+    if len(matches) == 1:
+        return matches[0][1], matches[0][2]
+        
+    # Priority sorting: sexual_offense (0), criminal (1), others (2)
+    def priority_key(item):
+        idx = item[2]
+        cat = INTENT_TO_CATEGORY.get(idx, '')
+        if cat == 'sexual_offense':
+            return 0
+        if cat == 'criminal':
+            return 1
+        return 2
+        
+    matches.sort(key=priority_key)
+    
+    # Combine up to top 2 matches
+    combined_html = "⚖️ <strong>LexAI Multiple Legal Issues Detected</strong><br><br>" \
+                    "Aapke case mein multiple serious matters involve hain. Ek-ek karke niche dono ki details aur steps dekhein:<br><hr style='border-top: 1px dashed var(--border); margin: 15px 0;'>"
+    
+    for i, (score, ans_html, idx) in enumerate(matches[:2]):
+        combined_html += ans_html
+        if i < len(matches[:2]) - 1:
+            combined_html += "<br><hr style='border-top: 1px dashed var(--border); margin: 15px 0;'>"
+            
+    return combined_html, matches[0][2]
 
 # ── Main entry point ────────────────────────────────────────────────────────────
 def get_legal_response(user_text, context_intent_idx=None, conversation_history=None):

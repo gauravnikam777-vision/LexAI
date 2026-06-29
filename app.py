@@ -606,6 +606,66 @@ RISK_ADVICE = {
     'Low':    '✅ LOW RISK: Consider alternative dispute resolution (mediation) first.',
 }
 
+INTENT_STRATEGIES = {
+    22: { # Murder
+        'steps': [
+            'Call 112 immediately to report the murder and crime scene location.',
+            'Do NOT touch or disturb anything at the crime scene (weapons, blood, footprints).',
+            'If you are an eyewitness, secure any local CCTV footage immediately before it is overwritten.',
+            'File FIR under IPC Section 302 / BNS Section 101 at the nearest police station.',
+            'If you are a witness and receive threats, apply for witness protection under the 2018 Scheme.'
+        ],
+        'laws': ['IPC Section 302 / BNS Section 101 (Murder)', 'IPC Section 201 / BNS Section 238 (Evidence Destruction)', 'Witness Protection Scheme 2018']
+    },
+    35: { # Sexual Assault
+        'steps': [
+            'Call 112 or Women Helpline 1091 / 181 immediately.',
+            'Do NOT change clothes or bathe/wash before the medical examination to preserve DNA.',
+            'Go to a Government Hospital immediately for a Medico-Legal checkup (within 24 hours).',
+            'File an FIR (or Zero FIR) under IPC Section 376 / BNS Section 63 at any police station.',
+            'Ensure the victim\'s statement is recorded by a female police officer.'
+        ],
+        'laws': ['IPC Section 375/376 / BNS Section 63/64 (Rape)', 'CrPC Section 164A / BNSS Section 184 (Medical Exam)']
+    },
+    21: { # Theft
+        'steps': [
+            'Call 112 immediately and preserve the scene for fingerprint analysis.',
+            'Make a detailed list of all stolen items (cash, jewelry, electronics with bills).',
+            'File FIR under IPC Section 380 / BNS Section 305 (Theft in dwelling house).',
+            'If phone/laptop is stolen, block IMEI on CEIR portal (ceir.gov.in) and block SIM cards.',
+            'Notify your home insurance company within 24 hours of the incident.'
+        ],
+        'laws': ['IPC Section 378/380 / BNS Section 303/305 (Theft)', 'IPC Section 457 / BNS Section 332 (Housebreaking by night)']
+    },
+    2: { # Domestic Violence
+        'steps': [
+            'If in immediate danger, call 181 (Women Helpline) or 112 (Police) immediately.',
+            'File a complaint under DV Act 2005 to get an immediate Protection Order or Residence Order.',
+            'Register FIR under IPC Section 498A / BNS Section 85 (Cruelty by husband/relatives).',
+            'Preserve evidence of cruelty: hospital MLC, photos, threatening messages, voice records.'
+        ],
+        'laws': ['DV Act 2005', 'IPC Section 498A / BNS Section 85 (Dowry Cruelty)', 'Dowry Prohibition Act 1961']
+    },
+    1: { # Cheque Bounce
+        'steps': [
+            'Obtain the Cheque Return Memo from your bank showing proof of dishonour.',
+            'Send a Legal Demand Notice to the drawer via Registered Post within 30 days of receiving the memo.',
+            'Wait 15 days for the drawer to pay. If they fail, proceed to court.',
+            'File a criminal complaint in Judicial Magistrate Court within 30 days of the 15-day notice period expiry.'
+        ],
+        'laws': ['Section 138, Negotiable Instruments Act 1881']
+    },
+    3: { # Cyber Crime
+        'steps': [
+            'Call National Cyber Crime Helpline 1930 immediately to freeze fraudulent transactions.',
+            'Register an online complaint at cybercrime.gov.in within 24-72 hours.',
+            'Take screenshots of all fraud links, WhatsApp/Telegram messages, transaction IDs.',
+            'Visit the local Cyber Crime Cell to file a formal FIR.',
+            'Block all compromised bank accounts, cards, and UPI IDs immediately.'
+        ],
+        'laws': ['IT Act 2000 Section 66C/66D', 'IPC Section 420 / BNS Section 318 (Cheating)']
+    }
+}
 
 def generate_strategy(category, risk_level):
     cat_s = STRATEGY.get(category, STRATEGY.get('fraud', {}))
@@ -1172,9 +1232,17 @@ def analyze():
     # ML results — always show if we have category prediction
     # (advanced_strategy how_to_do may be empty if dataset entry is bare)
     if ml_data and ml_data.get('category'):
-        # Build strategy: prefer RAG-matched dataset entry (if categories align), else template
-        adv = ml_data.get('advanced_strategy')
-        if adv and adv.get('how_to_do') and adv.get('rag_category') == ml_data['category']:
+        # Build strategy:
+        # 1. First priority: Check if a specific intent is matched and has a custom strategy template
+        if new_intent_idx is not None and new_intent_idx in INTENT_STRATEGIES:
+            istr = INTENT_STRATEGIES[new_intent_idx]
+            strategy = {
+                'steps':          istr['steps'],
+                'advice':         RISK_ADVICE.get(ml_data['risk_level'], ''),
+                'applicable_laws': istr['laws'],
+            }
+        # 2. Second priority: Prefer RAG-matched dataset entry (if categories align)
+        elif adv and adv.get('how_to_do') and adv.get('rag_category') == ml_data['category']:
             laws_raw = adv.get('ipc_sections', '')
             applicable_laws = [l.strip() for l in re.split(r'[|,]', laws_raw) if l.strip()]
             strategy = {
@@ -1182,8 +1250,8 @@ def analyze():
                 'advice'         : f"{adv.get('what_to_do','')}  <em>({adv.get('when_to_do','')})</em>",
                 'applicable_laws': applicable_laws or LAW_MAP.get(ml_data['category'], []),
             }
+        # 3. Third priority: Fallback to general category templates
         else:
-            # Fallback: use our hardcoded strategy templates (always reliable)
             strategy = generate_strategy(ml_data['category'], ml_data['risk_level'])
 
         response.update({
