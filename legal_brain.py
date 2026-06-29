@@ -254,6 +254,7 @@ INTENTS = [
     {"kw":["land acquisition","government took land","sarkar ne zameen","compensation land","rfctlarr","la act","nhia","airport land","highway land","government land","compulsory acquisition","eminent domain","sarkar ne khet"],"ans":lambda: LAND_ACQ},
     {"kw":["passport","visa problem","travel document","passport office","passport not coming","tatkaal","ecr passport","police verification passport","passport renew","passport impound","passport stuck","passport delay","travel ban"],"ans":lambda: PASSPORT},
     {"kw":["rape","balatkar","blaatkar","assault woman","outrage modesty","sexual assault","forcible sex","raped","rapist"],"ans":lambda: SEXUAL_ASSAULT},
+    {"kw":["lawyer details","vakil details","lawyer list","list of lawyers","fees details","advocate contact","lawyers win rate","fees contact win rate","konsa lawyer","specialist lawyer","lawyer name","advocate details"],"ans":lambda: LAWYER_DETAILS},
 ]
 
 # Maps intent index → correct ML category (overrides inaccurate ML model predictions)
@@ -294,6 +295,7 @@ INTENT_TO_CATEGORY = {
     33: 'property',            # land_acquisition
     34: 'constitutional',      # passport
     35: 'sexual_offense',      # sexual_assault
+    36: 'criminal',            # lawyer_details
 }
 
 # Pre-normalize all keywords in INTENTS for maximum performance and matching accuracy
@@ -794,6 +796,49 @@ SEXUAL_ASSAULT = """🚨 <strong>Sexual Assault / Rape — Emergency Legal Guide
 5. <strong>Lady Police Officer</strong>: Under BNSS 173, the victim's statement must be recorded by a female police officer at the victim's residence or choice of place.<br><br>
 ⚖️ <strong>Laws:</strong> IPC Section 375/376 | BNS Section 63/64, CrPC 164A | BNSS 184."""
 
+LAWYER_DETAILS = """⚖️ <strong>LexAI Senior Panel Lawyers & Advocates</strong><br><br>
+LexAI Platform ke top-rated senior panel advocates ki profiles aur details niche hain:<br><br>
+
+<div class="lawyer-card-list" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+  <div style="border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);">
+    <strong>Adv. Rajendra Prasad (Senior Criminal Advocate)</strong><br>
+    🎓 <strong>Experience:</strong> 28 Years<br>
+    🎯 <strong>Specialization:</strong> Criminal Trials, Murder (BNS 101), Bail, High Court Appeals<br>
+    📈 <strong>Case Win Rate:</strong> 84%<br>
+    💵 <strong>Consultation Fee:</strong> ₹3,500 / session<br>
+    📞 <strong>Contact:</strong> +91 98765 43210 | r.prasad@lexai.in
+  </div>
+
+  <div style="border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);">
+    <strong>Adv. Meera Sen (Criminal Trial Specialist)</strong><br>
+    🎓 <strong>Experience:</strong> 15 Years<br>
+    🎯 <strong>Specialization:</strong> POCSO, Rape Cases, Domestic Violence, Theft Trials<br>
+    📈 <strong>Case Win Rate:</strong> 79%<br>
+    💵 <strong>Consultation Fee:</strong> ₹2,000 / session<br>
+    📞 <strong>Contact:</strong> +91 98765 01234 | m.sen@lexai.in
+  </div>
+
+  <div style="border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);">
+    <strong>Adv. Vikram Malhotra (Senior Civil & Family Lawyer)</strong><br>
+    🎓 <strong>Experience:</strong> 20 Years<br>
+    🎯 <strong>Specialization:</strong> Divorce, Maintenance, Property Disputes, Ancestral Rights<br>
+    📈 <strong>Case Win Rate:</strong> 82%<br>
+    💵 <strong>Consultation Fee:</strong> ₹3,000 / session<br>
+    📞 <strong>Contact:</strong> +91 98765 98765 | v.malhotra@lexai.in
+  </div>
+
+  <div style="border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);">
+    <strong>Adv. Rohan Joshi (Cyber, Tax & Corporate Counsel)</strong><br>
+    🎓 <strong>Experience:</strong> 10 Years<br>
+    🎯 <strong>Specialization:</strong> Online UPI/Bank Fraud, IT Act, Cheque Bounce, GST Appeals<br>
+    📈 <strong>Case Win Rate:</strong> 75%<br>
+    💵 <strong>Consultation Fee:</strong> ₹1,500 / session<br>
+    📞 <strong>Contact:</strong> +91 98765 56789 | r.joshi@lexai.in
+  </div>
+</div>
+<br>
+<em>Tip: Direct contact details pe consult karein ya dashboard ke "Book Appointment" tab se appointment file karein.</em>"""
+
 # ── Scoring engine ─────────────────────────────────────────────────────────────
 def score_intent(norm_text, keywords):
     best_score = 0
@@ -865,14 +910,38 @@ def get_sub_query_response(intent_idx, text):
     is_lawyer = any(w in norm for w in ['lawyer', 'vakil', 'advocate', 'vakeel', 'hire', 'consult'])
     is_sections = any(w in norm for w in ['dhara', 'dharaye', 'dharayen', 'section', 'sections', 'ipc', 'bns', 'act'])
     is_punishment = any(w in norm for w in ['saza', 'punishment', 'phansi', 'jail', 'qaid', 'penalty', 'imprisonment'])
+    is_details = any(w in norm for w in ['detail', 'details', 'name', 'experience', 'expirience', 'fees', 'contact', 'win rate', 'winrate', 'profile', 'profiles', 'list'])
     
     if intent_idx == 22: # Murder
         if is_lawyer:
-            return "⚖️ <strong>Murder Case — Lawyer Guidance</strong><br><br>" \
-                   "Murder (IPC 302 / BNS 101) case ek Sessions Court trial matter hota hai. Iske liye:<br>" \
-                   "1. Aapko ek experienced <strong>Criminal Defense Lawyer</strong> (agar accused side hai) ya senior <strong>Criminal Trial Advocate</strong> (victim/witness side ke liye) consult karna chahiye.<br>" \
-                   "2. Lawyer ko Sessions Court trials aur criminal cross-examination ka achha experience hona zaroori hai.<br>" \
-                   "3. Aap platform ke 'Book Appointment' section se qualified Criminal Lawyers se consult kar sakte hain."
+            if is_details:
+                return "⚖️ <strong>LexAI Criminal Panel Lawyers — Murder & Homicide Specialists</strong><br><br>" \
+                       "Murder (BNS 101 / IPC 302) cases ke liye specialized advocates ki contact details aur profiles niche hain:<br><br>" \
+                       "<div class='lawyer-card-list' style='display:flex; flex-direction:column; gap:12px; margin-top:10px;'>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Rajendra Prasad (Senior Criminal Advocate)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 28 Years (Supreme Court & High Court)<br>" \
+                       "    🎯 <strong>Specialization:</strong> Murder Trials, Homicide, Criminal Appeals<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 84%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹3,500 / session<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 43210 | r.prasad@lexai.in" \
+                       "  </div>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Meera Sen (Criminal Trial Specialist)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 15 Years (Sessions Court & High Court)<br>" \
+                       "    🎯 <strong>Specialization:</strong> Cross-Examination, Bail Applications, BNS Trials<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 79%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹2,000 / session<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 01234 | m.sen@lexai.in" \
+                       "  </div>" \
+                       "</div><br>" \
+                       "<em>Tip: Aap direct details pe contact kar sakte hain ya dashboard ke \"Book Appointment\" tab se booking request file kar sakte hain.</em>"
+            else:
+                return "⚖️ <strong>Murder Case — Lawyer Guidance</strong><br><br>" \
+                       "Murder (IPC 302 / BNS 101) case ek Sessions Court trial matter hota hai. Iske liye:<br>" \
+                       "1. Aapko ek experienced <strong>Criminal Defense Lawyer</strong> (agar accused side hai) ya senior <strong>Criminal Trial Advocate</strong> (victim/witness side ke liye) consult karna chahiye.<br>" \
+                       "2. Lawyer ko Sessions Court trials aur criminal cross-examination ka achha experience hona zaroori hai.<br>" \
+                       "3. Aap platform ke 'Book Appointment' section se qualified Criminal Lawyers se consult kar sakte hain."
         if is_sections:
             return "⚖️ <strong>Murder Case — Applicable Sections</strong><br><br>" \
                    "Murder case mein main sections yeh hote hain:<br>" \
@@ -888,8 +957,30 @@ def get_sub_query_response(intent_idx, text):
 
     if intent_idx == 35: # Sexual Assault / Rape
         if is_lawyer:
-            return "⚖️ <strong>Sexual Offense — Lawyer Guidance</strong><br><br>" \
-                   "Sexual assault/rape cases ke liye aapko ek senior <strong>Criminal Trial Lawyer</strong> or specialized advocate who handles POCSO/Rape cases consult karna chahiye. Aap 'Book Appointment' section se specialized advocates se consult kar sakte hain."
+            if is_details:
+                return "⚖️ <strong>LexAI Criminal Panel Lawyers — Sexual Assault & Rape Cases</strong><br><br>" \
+                       "Rape aur sexual offense cases ke liye specialized advocates ki contact details aur profiles niche hain:<br><br>" \
+                       "<div class='lawyer-card-list' style='display:flex; flex-direction:column; gap:12px; margin-top:10px;'>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Meera Sen (Criminal Trial Specialist)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 15 Years (Sessions Court & High Court)<br>" \
+                       "    🎯 <strong>Specialization:</strong> POCSO, Rape Cases, Women Protection Laws<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 79%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹2,000 / session (Free initial legal aid for victims)<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 01234 | m.sen@lexai.in" \
+                       "  </div>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Rajendra Prasad (Senior Criminal Advocate)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 28 Years<br>" \
+                       "    🎯 <strong>Specialization:</strong> Criminal Defense, Cross-Examination, Bail Appeals<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 84%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹3,500 / session<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 43210 | r.prasad@lexai.in" \
+                       "  </div>" \
+                       "</div>"
+            else:
+                return "⚖️ <strong>Sexual Offense — Lawyer Guidance</strong><br><br>" \
+                       "Sexual assault/rape cases ke liye aapko ek senior <strong>Criminal Trial Lawyer</strong> or specialized advocate who handles POCSO/Rape cases consult karna chahiye. Aap 'Book Appointment' section se specialized advocates se consult kar sakte hain."
         if is_sections:
             return "⚖️ <strong>Sexual Offense — Applicable Sections</strong><br><br>" \
                    "Sexual assault cases mein main laws yeh hain:<br>" \
@@ -902,8 +993,30 @@ def get_sub_query_response(intent_idx, text):
 
     if intent_idx == 21: # Theft
         if is_lawyer:
-            return "⚖️ <strong>Theft Case — Lawyer Guidance</strong><br><br>" \
-                   "Theft cases Magistrate Court level pe handle hote hain. Iske liye ek general <strong>Criminal Advocate</strong> jo bail aur criminal complaints file karta ho, wo hire karein."
+            if is_details:
+                return "⚖️ <strong>LexAI Criminal Panel Lawyers — Theft & Burglary Specialists</strong><br><br>" \
+                       "Theft aur burglary cases ke liye specialized advocates ki contact details aur profiles niche hain:<br><br>" \
+                       "<div class='lawyer-card-list' style='display:flex; flex-direction:column; gap:12px; margin-top:10px;'>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Meera Sen (Criminal Trial Specialist)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 15 Years<br>" \
+                       "    🎯 <strong>Specialization:</strong> Theft, Bail, Police Complaints, Evidence Seizure<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 79%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹2,000 / session<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 01234 | m.sen@lexai.in" \
+                       "  </div>" \
+                       "  <div style='border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el);'>" \
+                       "    <strong>Adv. Rohan Joshi (Cyber & Criminal Advocate)</strong><br>" \
+                       "    🎓 <strong>Experience:</strong> 10 Years<br>" \
+                       "    🎯 <strong>Specialization:</strong> Mobile/Laptop Theft, Cyber Fraud, CEIR registry<br>" \
+                       "    📈 <strong>Case Win Rate:</strong> 75%<br>" \
+                       "    💵 <strong>Consultation Fee:</strong> ₹1,500 / session<br>" \
+                       "    📞 <strong>Contact:</strong> +91 98765 56789 | r.joshi@lexai.in" \
+                       "  </div>" \
+                       "</div>"
+            else:
+                return "⚖️ <strong>Theft Case — Lawyer Guidance</strong><br><br>" \
+                       "Theft cases Magistrate Court level pe handle hote hain. Iske liye ek general <strong>Criminal Advocate</strong> jo bail aur criminal complaints file karta ho, wo hire karein."
         if is_sections:
             return "⚖️ <strong>Theft Case — Applicable Sections</strong><br><br>" \
                    "Theft case mein main sections yeh hain:<br>" \
