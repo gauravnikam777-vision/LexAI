@@ -1110,6 +1110,25 @@ def dashboard():
 # ══════════════════════════════════════════════════════════════════
 #  API: CHATBOT / ANALYZE
 # ══════════════════════════════════════════════════════════════════
+@app.route('/api/chat-history', methods=['GET'])
+def get_chat_history():
+    if 'user_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    user_id = session.get('user_id')
+    try:
+        with get_db() as conn:
+            row = conn.execute(
+                "SELECT history_json FROM chat_sessions WHERE user_id=?", (user_id,)
+            ).fetchone()
+            if row and row['history_json']:
+                import json as _json
+                history = _json.loads(row['history_json'])
+                return jsonify({'history': history})
+    except Exception as e:
+        print(f"[Error getting chat history] {e}")
+    return jsonify({'history': []})
+
+
 @app.route('/api/analyze', methods=['POST'])
 def analyze():
     if 'user_id' not in session:
@@ -1232,6 +1251,7 @@ def analyze():
     # ML results — always show if we have category prediction
     # (advanced_strategy how_to_do may be empty if dataset entry is bare)
     if ml_data and ml_data.get('category'):
+        adv = ml_data.get('advanced_strategy')
         # Build strategy:
         # 1. First priority: Check if a specific intent is matched and has a custom strategy template
         if new_intent_idx is not None and new_intent_idx in INTENT_STRATEGIES:

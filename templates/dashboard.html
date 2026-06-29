@@ -2163,6 +2163,41 @@ function renderMlPanel(d, prefix) {
   }
 }
 
+async function loadChatHistory() {
+  if (ROLE !== 'client') return;
+  try {
+    const res = await fetch('/api/chat-history');
+    const d = await res.json();
+    if (d.history && d.history.length) {
+      const box = document.getElementById('clientChatMsgs');
+      if (box) {
+        box.innerHTML = '';
+        d.history.forEach(m => {
+          appendMsg('clientChatMsgs', m.role === 'assistant' ? 'ai' : 'user', m.content);
+        });
+        box.scrollTop = box.scrollHeight;
+        
+        // Find last user query to restore side panel state on reload
+        let lastUserQuery = '';
+        for (let i = d.history.length - 1; i >= 0; i--) {
+          if (d.history[i].role === 'user') {
+            lastUserQuery = d.history[i].content;
+            break;
+          }
+        }
+        if (lastUserQuery) {
+          const d_ml = await fetchAnalyze(lastUserQuery);
+          if (d_ml.has_ml) {
+            renderMlPanel(d_ml, 'client');
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load chat history:', err);
+  }
+}
+
 // ═══════════════════════════════════════════════════════════
 //  CLIENT CHATBOT — command state machine
 // ═══════════════════════════════════════════════════════════
@@ -3344,7 +3379,7 @@ function toggleSidebar() {
 //  INIT
 // ═══════════════════════════════════════════════════════════
 (function init() {
-  if (ROLE==='client')          { loadClientStats(); }
+  if (ROLE==='client')          { loadClientStats(); loadChatHistory(); }
   if (ROLE==='lawyer')          { loadLawyerStats(); }
   if (ROLE==='admin')           { loadAdminHome(); }
   if (ROLE==='chatbot_manager') { loadCbmStats(); }
