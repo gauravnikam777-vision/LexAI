@@ -2222,6 +2222,36 @@ async function clientSend(prefill) {
   }
 
   const lower = text.toLowerCase().trim();
+
+  // Advanced Action Interception: Check if user is asking to trigger a flow
+  if (lower.includes('submit case') || lower.includes('case submit') || lower.includes('new case') || 
+      lower.includes('naya case') || lower.includes('nayi case') || lower.includes('register case') || 
+      lower.includes('file case') || lower.includes('lodge case') || lower.includes('lodge complaint')) {
+    await startCaseFlow();
+    document.getElementById('clientSendBtn').disabled = false;
+    return;
+  }
+  
+  if (lower.includes('book appointment') || lower.includes('appointment book') || lower.includes('take appointment') || 
+      lower.includes('schedule appointment') || lower.includes('meet lawyer') || lower.includes('appointment le')) {
+    await startApptFlow();
+    document.getElementById('clientSendBtn').disabled = false;
+    return;
+  }
+  
+  if (lower.includes('cancel appointment') || lower.includes('appointment cancel') || lower.includes('cancel appt')) {
+    await startCancelApptFlow();
+    document.getElementById('clientSendBtn').disabled = false;
+    return;
+  }
+  
+  if (lower.includes('my cases') || lower.includes('show cases') || lower.includes('mera case') || 
+      lower.includes('mere cases') || lower.includes('case status')) {
+    await showMyCasesInChat();
+    document.getElementById('clientSendBtn').disabled = false;
+    return;
+  }
+
   // Strict command matching: only trigger if the message IS the command, or very close to it.
   // Extra slack of 15 chars prevents long complaint sentences from accidentally firing commands.
   // e.g. "mera case submit nahi ho raha..." should NOT trigger "mera case" command.
