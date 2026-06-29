@@ -579,15 +579,37 @@ Yeh sun ke bahut bura laga. Ghabrao mat — ab seedha kaam pe aate hain. Yeh kar
 Important: Agar police FIR likhne se mana kare — SP office ya Magistrate Court mein seedha complaint de sakte ho. Yeh tumhara kanoon ki haq hai.<br><br>
 Koi aur sawaal hai ya aur details chahiye? Batao — main hoon!"""
 
-MURDER = """⚖️ <strong>Homicide / Murder — Legal Provisions</strong><br><br>
-• <strong>IPC 302 / BNS 101 — Murder:</strong> Death or Life Imprisonment + Fine<br>
-• <strong>IPC 304 / BNS 105 — Culpable Homicide (not murder):</strong> 10 years / Life<br>
-• <strong>IPC 304A / BNS 106 — Negligent Killing (accidents):</strong> Up to 2 years + Fine<br>
-• <strong>IPC 307 / BNS 109 — Attempt to Murder:</strong> Up to 10 years<br><br>
-<strong>Investigation:</strong> CBI or State Police depending on case. Post-mortem report is key evidence.<br>
-<strong>Trial:</strong> Sessions Court (murder is tried only at Sessions Court level or higher).<br><br>
-For victims' families: File FIR immediately, demand fair investigation, apply for bail opposition if accused arrested.<br><br>
-⚖️ <strong>Laws:</strong> IPC 299-309 / BNS 100-113."""
+MURDER = """⚖️ <strong>Murder / Hatya — Complete Legal Guide (Step by Step)</strong><br><br>
+Yeh bohot serious matter hai. Ghabrao mat — main hoon aapke saath. Calmly ek-ek step follow karo:<br><br>
+<span style='color:#f08080'>🚨 SABSE PEHLE — TURANT YEH KARO:</span><br>
+1. <strong>112 pe call karo</strong> — Police ko turant inform karo. Location clearly batao.<br>
+2. <strong>Kisi cheez ko mat chhuo</strong> — crime scene ko disturb mat karo. Evidence (blood stains, weapon, footprints) bahut critical hai.<br>
+3. <strong>Ambulance ke liye 108 call karo</strong> — agar victim abhi zinda hai toh medical help pehle. Har second matters.<br>
+4. <strong>Agar aapne dekha hai (eyewitness)</strong> — apni safety pehle. Accused se door raho aur police aane tak safe jagah pe raho.<br><br>
+<strong>AGAR AAP EYEWITNESS HAIN (Aapne Murder Dekha):</strong><br>
+1. <strong>FIR mein apna statement do</strong> — Police station jaake apna eyewitness account clearly likhaao.<br>
+2. <strong>CCTV footage secure karo ABHI</strong> — Society/colony/neighbours ke cameras ka footage 24-48 ghante mein overwrite ho sakta hai! Police ko bolke seize karwao ya khud backup lo.<br>
+3. <strong>IPC Section 302 / BNS 101</strong> ke under FIR darj hogi — aapka statement key evidence banega court mein.<br>
+4. <strong>Witness Protection</strong> — Agar aapko dhamki mile toh turant police ko batao aur <strong>Witness Protection Scheme 2018</strong> ke under protection maango. Yeh aapka legal right hai.<br>
+5. <strong>Court mein gawahi</strong> — Aapko Sessions Court mein apna statement dena hoga. Sach bolna — jhoothi gawahi IPC 193/BNS 229 ke under punishable hai (7 saal tak).<br><br>
+<strong>AGAR AAP VICTIM KE FAMILY MEMBER HAIN:</strong><br>
+1. <strong>FIR darj karwao</strong> — IPC 302 / BNS 101 (Murder) ke under. Agar police mana kare toh SP office ya Magistrate Court (Sec 156(3)) mein complaint do.<br>
+2. <strong>Post-mortem report</strong> — Yeh sabse important evidence hai. Government hospital mein hota hai. Report ki copy zaroor lo.<br>
+3. <strong>Bail opposition karo</strong> — Jab accused arrest ho, uski bail hearing mein oppose karo through your lawyer. Murder non-bailable hai.<br>
+4. <strong>Victim Compensation Scheme</strong> — State Legal Services Authority ke paas apply karo — financial help milti hai victim ke family ko.<br>
+5. <strong>Private lawyer rakh lo</strong> — Public prosecutor ke saath apna lawyer bhi rakhna zaroori hai taaki investigation fair ho.<br><br>
+<strong>Applicable Laws:</strong><br>
+• <strong>IPC 302 / BNS 101 — Murder:</strong> Death Penalty ya Life Imprisonment + Fine<br>
+• <strong>IPC 304 / BNS 105 — Culpable Homicide (not murder):</strong> 10 saal / Life<br>
+• <strong>IPC 304A / BNS 106 — Negligent Killing:</strong> Up to 2 years + Fine<br>
+• <strong>IPC 307 / BNS 109 — Attempt to Murder:</strong> Up to 10 years (Life agar hurt ho)<br>
+• <strong>IPC 201 / BNS 238 — Evidence Destroy Karna:</strong> Up to 7 years<br><br>
+<strong>Important Facts:</strong><br>
+• Murder trial <strong>Sessions Court</strong> mein hota hai — Magistrate Court mein nahi.<br>
+• Investigation CBI ya State Police karti hai depending on case.<br>
+• Post-mortem report aur eyewitness statements <strong>most critical evidence</strong> hain.<br>
+• Accused ko bail milna bohot mushkil hai — murder non-bailable offense hai.<br><br>
+Koi aur details hain ya sawaal hai? Batao — main hoon aapke saath. 🙏"""
 
 FRAUD_GENERAL = """💸 <strong>Fraud / Cheating — Legal Remedies</strong><br><br>
 • <strong>IPC 420 / BNS 318:</strong> Cheating — up to 7 years + fine<br>
