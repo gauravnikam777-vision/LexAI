@@ -783,6 +783,7 @@
       /* Chat adjustments */
       .chat-container { height: 75vh !important; }
       .msg-bubble { max-width: 90% !important; }
+      .key-hint { display: none !important; }
     }
   </style>
 </head>
@@ -1033,10 +1034,10 @@
           <div class="chat-input-row">
             <textarea class="chat-textarea form-control" id="clientChatInput" rows="1"
               placeholder="Apni legal problem likho ya command dalo (e.g. 'submit case')…"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();clientSend();}"></textarea>
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window.innerWidth>768){event.preventDefault();clientSend();}"></textarea>
             <button class="chat-send-btn" id="clientSendBtn" onclick="clientSend()"><i class="fa fa-paper-plane"></i></button>
           </div>
-          <small class="text-muted" style="font-size:10px; display:block; margin-top:5px;">Enter = send · Shift+Enter = new line</small>
+          <small class="text-muted key-hint" style="font-size:10px; display:block; margin-top:5px;">Enter = send · Shift+Enter = new line</small>
         </div>
       </div>
     </div>
@@ -1160,7 +1161,7 @@
           <div class="chat-input-row">
             <textarea class="chat-textarea form-control" id="lawyerChatInput" rows="1"
               placeholder="Legal research query or case question…"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();lawyerSend();}"></textarea>
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window.innerWidth>768){event.preventDefault();lawyerSend();}"></textarea>
             <button class="chat-send-btn" id="lawyerSendBtn" onclick="lawyerSend()"><i class="fa fa-paper-plane"></i></button>
           </div>
         </div>
@@ -1243,7 +1244,7 @@
           <div class="chat-input-row">
             <textarea class="chat-textarea form-control" id="adminChatInput" rows="1"
               placeholder="Legal research or admin query…"
-              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSend();}"></textarea>
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey&&window.innerWidth>768){event.preventDefault();adminSend();}"></textarea>
             <button class="chat-send-btn" onclick="adminSend()"><i class="fa fa-paper-plane"></i></button>
           </div>
         </div>
