@@ -196,6 +196,29 @@ def init_db():
             print("     admin1/admin123 | lawyer1/lawyer123")
             print("     client1/client123 | cbm1/cbm123")
 
+        # Seed specialized panel lawyers if not present
+        _hash = lambda p: hashlib.sha256(p.encode()).hexdigest()
+        panel_lawyers = [
+            ('adv_rajendra', _hash('lawyer123'), 'lawyer', 'Rajendra Prasad', 'r.prasad@lexai.in'),
+            ('adv_meera', _hash('lawyer123'), 'lawyer', 'Meera Sen', 'm.sen@lexai.in'),
+            ('adv_vikram', _hash('lawyer123'), 'lawyer', 'Vikram Malhotra', 'v.malhotra@lexai.in'),
+            ('adv_rohan', _hash('lawyer123'), 'lawyer', 'Rohan Joshi', 'r.joshi@lexai.in'),
+        ]
+        for uname, pwd, role, full_name, email in panel_lawyers:
+            conn.execute(
+                """INSERT OR IGNORE INTO users(username, password, role, full_name, email)
+                   VALUES(?,?,?,?,?)""",
+                (uname, pwd, role, full_name, email)
+            )
+        conn.commit()
+
+        # Check if assigned_lawyer_id column exists in cases, if not add it
+        cursor = conn.execute("PRAGMA table_info(cases)")
+        columns = [row['name'] for row in cursor.fetchall()]
+        if 'assigned_lawyer_id' not in columns:
+            conn.execute("ALTER TABLE cases ADD COLUMN assigned_lawyer_id INTEGER REFERENCES users(id)")
+            conn.commit()
+
         # Seed default system config
         defaults = [
             ('chatbot_enabled', '1'),
@@ -1343,12 +1366,14 @@ def cases():
 
         strategy = generate_strategy(ml['category'], ml['risk_level'])
 
+        assigned_lawyer_id = data.get('assigned_lawyer_id')
+
         with get_db() as conn:
             cur = conn.execute(
-                """INSERT INTO cases(user_id,title,description,category,risk_level,outcome_pred,outcome_prob)
-                   VALUES(?,?,?,?,?,?,?)""",
+                """INSERT INTO cases(user_id,title,description,category,risk_level,outcome_pred,outcome_prob,assigned_lawyer_id)
+                   VALUES(?,?,?,?,?,?,?,?)""",
                 (session['user_id'], title, desc,
-                 ml['category'], ml['risk_level'], 'win', ml['win_probability'])
+                 ml['category'], ml['risk_level'], 'win', ml['win_probability'], assigned_lawyer_id)
             )
             conn.commit()
             case_id = cur.lastrowid
@@ -1368,13 +1393,24 @@ def cases():
 
     # GET — return cases based on role
     with get_db() as conn:
-        if session['role'] in ('lawyer', 'admin'):
+        if session['role'] == 'lawyer':
+            rows = conn.execute(
+                """SELECT c.*, u.username FROM cases c 
+                   JOIN users u ON c.user_id=u.id 
+                   WHERE c.assigned_lawyer_id=? OR c.assigned_lawyer_id IS NULL 
+                   ORDER BY c.created DESC""",
+                (session['user_id'],)
+            ).fetchall()
+        elif session['role'] == 'admin':
             rows = conn.execute(
                 "SELECT c.*, u.username FROM cases c JOIN users u ON c.user_id=u.id ORDER BY c.created DESC"
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT * FROM cases WHERE user_id=? ORDER BY created DESC",
+                """SELECT c.*, u.username as lawyer_username, u.full_name as lawyer_full_name 
+                   FROM cases c 
+                   LEFT JOIN users u ON c.assigned_lawyer_id=u.id
+                   WHERE c.user_id=? ORDER BY c.created DESC""",
                 (session['user_id'],)
             ).fetchall()
     return jsonify([dict(r) for r in rows])
@@ -1462,12 +1498,14 @@ def case_notes(case_id):
 @app.route('/api/book_appointment', methods=['POST'])
 @role_required('client')
 def book_appointment():
-    data     = request.get_json()
-    category = data.get('category', 'general')
-    note     = data.get('note', '')
+    data      = request.get_json()
+    category  = data.get('category', 'general')
+    note      = data.get('note', '')
+    lawyer_id = data.get('lawyer_id')
     with get_db() as conn:
-        lawyer = conn.execute("SELECT id FROM users WHERE role='lawyer' LIMIT 1").fetchone()
-        lawyer_id = lawyer['id'] if lawyer else None
+        if not lawyer_id:
+            lawyer = conn.execute("SELECT id FROM users WHERE role='lawyer' LIMIT 1").fetchone()
+            lawyer_id = lawyer['id'] if lawyer else None
         conn.execute(
             "INSERT INTO appointments(client_id,lawyer_id,category,note) VALUES(?,?,?,?)",
             (session['user_id'], lawyer_id, category, note)
@@ -1485,13 +1523,15 @@ def get_appointments():
     with get_db() as conn:
         if session['role'] in ('lawyer', 'admin'):
             rows = conn.execute(
-                """SELECT a.*, u.username as client_name
+                """SELECT a.*, u.username as client_name, u.full_name as client_full_name
                    FROM appointments a JOIN users u ON a.client_id=u.id
                    ORDER BY a.created DESC"""
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT * FROM appointments WHERE client_id=? ORDER BY created DESC",
+                """SELECT a.*, u.username as lawyer_username, u.full_name as lawyer_full_name 
+                   FROM appointments a JOIN users u ON a.lawyer_id=u.id
+                   WHERE a.client_id=? ORDER BY a.created DESC""",
                 (session['user_id'],)
             ).fetchall()
     return jsonify([dict(r) for r in rows])
@@ -1508,6 +1548,16 @@ def update_appointment_status(appt_id):
         conn.execute("UPDATE appointments SET status=? WHERE id=?", (status, appt_id))
         conn.commit()
     return jsonify({'ok': True, 'msg': f'Appointment {status}'})
+
+
+@app.route('/api/lawyers', methods=['GET'])
+@login_required
+def get_lawyers_list():
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT id, username, full_name, email FROM users WHERE role='lawyer'"
+        ).fetchall()
+    return jsonify([dict(r) for r in rows])
 
 
 @app.route('/api/admin/users', methods=['GET'])

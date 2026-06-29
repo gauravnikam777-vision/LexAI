@@ -960,6 +960,24 @@
 <!-- ── CLIENT HOME ── -->
 {% if role == 'client' %}
 <div class="panel active" id="panel-home">
+  <!-- Completed Appointments Banner Container -->
+  <div id="completedApptBanner" style="display:none; margin-bottom:16px;">
+    <div style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 12px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 20px rgba(168, 85, 247, 0.1); backdrop-filter: blur(10px);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="background: var(--purple); color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);">
+          <i class="fa fa-handshake"></i>
+        </div>
+        <div>
+          <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: var(--txt);">Meeting Completed!</h4>
+          <p style="margin: 4px 0 0; font-size: 12px; color: var(--txt-muted);">Aapki meeting <strong>Adv. <span id="completedApptLawyerName"></span></strong> ke saath ho chuki hai. Naya case isi lawyer ko submit karein.</p>
+        </div>
+      </div>
+      <button id="submitCaseToLawyerBtn" class="btn btn-primary btn-sm" style="background: var(--purple); border: none; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); font-weight: 600; padding: 8px 16px; border-radius: 8px; cursor: pointer;">
+        <i class="fa fa-folder-plus"></i> Submit Case
+      </button>
+    </div>
+  </div>
+
   <!-- Stats -->
   <div class="stats-grid stats-grid-4 mb-16" id="clientStatsGrid">
     <div class="stat-card blue">
@@ -2324,6 +2342,27 @@ async function handleClientState(text) {
   await new Promise(r => setTimeout(r, 500));
   typing?.remove();
 
+  if (clientState === 'case_assign_lawyer') {
+    const answer = text.trim().toLowerCase();
+    if (answer === 'yes' || answer === 'y' || answer === '1') {
+      const appt = clientCtx.candidateLawyer;
+      clientCtx.assigned_lawyer_id = appt.lawyer_id;
+      appendMsg('clientChatMsgs', 'ai', `✅ Case will be assigned to <strong>${appt.lawyer_full_name || appt.lawyer_username}</strong>.`);
+    } else if (answer === 'no' || answer === 'n' || answer === '2') {
+      clientCtx.assigned_lawyer_id = null;
+      appendMsg('clientChatMsgs', 'ai', `📂 Case will be submitted generally without any assigned lawyer.`);
+    } else {
+      appendMsg('clientChatMsgs', 'ai', `❌ Invalid response. Please type <strong>yes</strong> or <strong>no</strong>:`);
+      return;
+    }
+    
+    setClientState('case_title', 'Step 1/2: Enter case title…');
+    appendMsg('clientChatMsgs', 'ai',
+      `<strong>Step 1/2:</strong> What is the title or subject of your case?<br>` +
+      `<em>E.g., "Property dispute with neighbor", "Cyber fraud by online seller"</em>`);
+    return;
+  }
+
   if (clientState === 'case_title') {
     clientCtx.title = text;
     setClientState('case_desc', 'Step 2/2: Describe your case…');
@@ -2340,7 +2379,11 @@ async function handleClientState(text) {
     try {
       const res = await fetch('/api/cases', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({title: clientCtx.title, description: clientCtx.description})
+        body: JSON.stringify({
+          title: clientCtx.title, 
+          description: clientCtx.description,
+          assigned_lawyer_id: clientCtx.assigned_lawyer_id
+        })
       });
       const d = await res.json();
       typing2?.remove();
@@ -2381,31 +2424,45 @@ async function handleClientState(text) {
     return;
   }
 
-  if (clientState === 'appt_cat') {
-    clientCtx.category = text;
+  if (clientState === 'appt_lawyer') {
+    const num = parseInt(text.trim());
+    const lawyers = clientCtx.lawyersList || [];
+    if (isNaN(num) || num < 1 || num > lawyers.length) {
+      appendMsg('clientChatMsgs', 'ai', `❌ Invalid selection. Please type a number between 1 and ${lawyers.length}:`);
+      return;
+    }
+    const selectedLawyer = lawyers[num - 1];
+    clientCtx.selectedLawyer = selectedLawyer;
+    clientCtx.category = selectedLawyer.specCategory;
+
     setClientState('appt_note', 'Step 2/2: Add a note…');
     appendMsg('clientChatMsgs', 'ai',
-      `📅 Category: <strong>${fmtCat(text)}</strong><br><br>Add a brief note for the lawyer (or type <em>"skip"</em> to skip):`)
+      `👤 Selected Lawyer: <strong>${selectedLawyer.displayName}</strong><br>` +
+      `📂 Category: <strong>${fmtCat(clientCtx.category)}</strong><br><br>` +
+      `Step 2/2: Add a brief note for the lawyer (or type <em>"skip"</em> to skip):`);
     return;
   }
 
   if (clientState === 'appt_note') {
     clientCtx.note = (text.toLowerCase()==='skip') ? '' : text;
+    const lawyerId = clientCtx.selectedLawyer ? clientCtx.selectedLawyer.id : null;
+    const lawyerName = clientCtx.selectedLawyer ? clientCtx.selectedLawyer.displayName : 'A specialist lawyer';
     setClientState(null);
     const typing2 = appendTyping('clientChatMsgs');
     try {
       const res = await fetch('/api/book_appointment', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({category: clientCtx.category, note: clientCtx.note})
+        body: JSON.stringify({category: clientCtx.category, note: clientCtx.note, lawyer_id: lawyerId})
       });
       const d = await res.json();
       typing2?.remove();
       if (d.ok) {
         appendMsg('clientChatMsgs', 'ai',
-          `✅ <strong>Appointment Requested!</strong><br><br>
+          `✅ <strong>Appointment Requested Successfully!</strong><br><br>
+           👤 Lawyer: <strong>${lawyerName}</strong><br>
            📅 Category: <strong>${fmtCat(clientCtx.category)}</strong><br>
            📝 Note: ${esc(clientCtx.note||'None')}<br><br>
-           A specialist lawyer will contact you shortly.<br><em>View in <strong>My Appointments</strong> panel.</em>`);
+           Advocate will contact you shortly.<br><em>View in <strong>My Appointments</strong> panel.</em>`);
         loadClientStats();
       } else {
         appendMsg('clientChatMsgs', 'ai', `❌ ${esc(d.message||'Could not book appointment.')}`);
@@ -2445,22 +2502,110 @@ async function handleClientState(text) {
   }
 }
 
-function startCaseFlow() {
-  setClientState('case_title', 'Step 1/2: Enter case title…');
-  appendMsg('clientChatMsgs', 'ai',
-    `📁 <strong>New Case Submission</strong><br><br>
-     Let's submit your case step by step.<br><br>
-     <strong>Step 1/2:</strong> What is the title or subject of your case?<br>
-     <em>E.g., "Property dispute with neighbor", "Cyber fraud by online seller", "Wrongful termination from job"</em>`);
+async function startCaseFlow() {
+  // If the client clicked the banner, the lawyer is already preset in clientCtx
+  if (clientCtx.assigned_lawyer_id) {
+    setClientState('case_title', 'Step 1/2: Enter case title…');
+    appendMsg('clientChatMsgs', 'ai',
+      `📁 <strong>New Case Submission</strong><br><br>` +
+      `This case will be directly assigned to <strong>${clientCtx.assigned_lawyer_name}</strong>.<br><br>` +
+      `<strong>Step 1/2:</strong> What is the title or subject of your case?<br>` +
+      `<em>E.g., "Property dispute with neighbor", "Cyber fraud by online seller"</em>`);
+    return;
+  }
+
+  const typing = appendTyping('clientChatMsgs');
+  let completedAppt = null;
+  try {
+    const res = await fetch('/api/appointments');
+    const appts = await res.json();
+    typing?.remove();
+    
+    // Find the most recent completed appointment
+    const completed = appts.filter(a => a.status === 'completed');
+    if (completed.length > 0) {
+      completedAppt = completed[0];
+    }
+  } catch (err) {
+    typing?.remove();
+  }
+  
+  if (completedAppt) {
+    clientCtx.candidateLawyer = completedAppt;
+    setClientState('case_assign_lawyer', 'Submit to the same lawyer? Yes/No…');
+    appendMsg('clientChatMsgs', 'ai',
+      `📁 <strong>New Case Submission</strong><br><br>` +
+      `Aapne haal hi mein <strong>${completedAppt.lawyer_full_name || completedAppt.lawyer_username}</strong> ke saath meeting complete ki hai.<br><br>` +
+      `Kya aap apna case <strong>isi same lawyer</strong> ko submit karna chahte hain?<br><br>` +
+      `Type <strong>yes</strong> or <strong>no</strong>:`);
+  } else {
+    clientCtx.assigned_lawyer_id = null;
+    setClientState('case_title', 'Step 1/2: Enter case title…');
+    appendMsg('clientChatMsgs', 'ai',
+      `📁 <strong>New Case Submission</strong><br><br>` +
+      `Let's submit your case step by step.<br><br>` +
+      `<strong>Step 1/2:</strong> What is the title or subject of your case?<br>` +
+      `<em>E.g., "Property dispute with neighbor", "Cyber fraud by online seller", "Wrongful termination from job"</em>`);
+  }
 }
 
-function startApptFlow() {
-  setClientState('appt_cat', 'Step 1/2: Select category…');
-  appendMsg('clientChatMsgs', 'ai',
-    `📅 <strong>Book Lawyer Appointment</strong><br><br>
-     What type of legal matter do you need consultation for?<br><br>
-     Type one of: <strong>property</strong>, <strong>family</strong>, <strong>labour</strong>, <strong>fraud</strong>,
-     <strong>consumer</strong>, <strong>criminal</strong>, <strong>motor_accident</strong>, or <strong>general</strong>`);
+async function startApptFlow() {
+  const typing = appendTyping('clientChatMsgs');
+  try {
+    const res = await fetch('/api/lawyers');
+    const lawyers = await res.json();
+    typing?.remove();
+    
+    if (!lawyers || lawyers.length === 0) {
+      appendMsg('clientChatMsgs', 'ai', '⚠️ No registered lawyers found in the system.');
+      return;
+    }
+    
+    // Store lawyers in clientCtx for lookup
+    clientCtx.lawyersList = lawyers;
+    setClientState('appt_lawyer', 'Select a lawyer by number…');
+    
+    // Map database lawyers to their detailed UI profiles
+    const profiles = {
+      'adv_rajendra': { name: 'Adv. Rajendra Prasad', exp: '28 Years', spec: 'Criminal & Murder', fee: '₹3,500', win: '84%' },
+      'adv_meera': { name: 'Adv. Meera Sen', exp: '15 Years', spec: 'Women Rights, Rape & POCSO', fee: '₹2,000', win: '79%' },
+      'adv_vikram': { name: 'Adv. Vikram Malhotra', exp: '20 Years', spec: 'Family & Civil Law', fee: '₹3,000', win: '82%' },
+      'adv_rohan': { name: 'Adv. Rohan Joshi', exp: '10 Years', spec: 'Cyber Crime, Tax & Fraud', fee: '₹1,500', win: '75%' },
+    };
+    
+    let html = `📅 <strong>Book Lawyer Appointment</strong><br><br>` +
+               `Aap kis lawyer ke saath appointment book karna chahte hain? Unka <strong>number</strong> type karein (e.g., 1, 2, etc.):<br><br>`;
+               
+    lawyers.forEach((l, idx) => {
+      // Find matching UI profile or fallback
+      const prof = profiles[l.username] || { 
+        name: l.full_name || l.username, 
+        exp: '10+ Years', 
+        spec: 'General Practice', 
+        fee: '₹1,500', 
+        win: '75%' 
+      };
+      
+      // Save profile name/category mapping in the array for booking submit
+      l.displayName = prof.name;
+      l.specCategory = l.username === 'adv_rajendra' ? 'criminal' : 
+                       l.username === 'adv_meera' ? 'criminal' :
+                       l.username === 'adv_vikram' ? 'family' :
+                       l.username === 'adv_rohan' ? 'cyber_crime' : 'general';
+                       
+      html += `<div style="border:1px solid var(--border); padding:12px; border-radius:8px; background:var(--bg-el); margin-bottom:10px;">` +
+              `<strong>${idx + 1}. ${prof.name}</strong><br>` +
+              `🎓 <strong>Experience:</strong> ${prof.exp}<br>` +
+              `🎯 <strong>Specialization:</strong> ${prof.spec}<br>` +
+              `📈 <strong>Win Rate:</strong> ${prof.win} | 💵 <strong>Fee:</strong> ${prof.fee}<br>` +
+              `</div>`;
+    });
+    
+    appendMsg('clientChatMsgs', 'ai', html);
+  } catch (err) {
+    typing?.remove();
+    appendMsg('clientChatMsgs', 'ai', '⚠️ Error loading registered lawyers list.');
+  }
 }
 
 async function startCancelApptFlow() {
@@ -2538,6 +2683,48 @@ async function loadClientStats() {
     });
     const mcClosed = document.getElementById('mc-closed');
     if (mcClosed) animateCount(mcClosed, d.closed||0);
+
+    // Completed Appointment Banner Logic
+    try {
+      const apptsRes = await fetch('/api/appointments');
+      const appts = await apptsRes.json();
+      const completed = appts.filter(a => a.status === 'completed');
+      
+      const casesRes = await fetch('/api/cases');
+      const cases = await casesRes.json();
+      
+      let showBanner = false;
+      let targetAppt = null;
+      
+      for (const appt of completed) {
+        // Check if there is already a case assigned to this lawyer
+        const alreadySubmitted = cases.some(c => c.assigned_lawyer_id === appt.lawyer_id);
+        if (!alreadySubmitted) {
+          showBanner = true;
+          targetAppt = appt;
+          break;
+        }
+      }
+      
+      const banner = document.getElementById('completedApptBanner');
+      if (banner) {
+        if (showBanner && targetAppt) {
+          const lawyerName = targetAppt.lawyer_full_name || targetAppt.lawyer_username;
+          document.getElementById('completedApptLawyerName').innerText = lawyerName;
+          banner.style.display = 'block';
+          
+          document.getElementById('submitCaseToLawyerBtn').onclick = () => {
+            clientCtx.assigned_lawyer_id = targetAppt.lawyer_id;
+            clientCtx.assigned_lawyer_name = lawyerName;
+            clientCmd('submit case');
+          };
+        } else {
+          banner.style.display = 'none';
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
   } catch {}
 }
 
@@ -2574,6 +2761,7 @@ async function loadMyCases() {
           <span class="badge badge-blue">${fmtCat(c.category)}</span>
           ${riskBadge(c.risk_level)}
           <span class="badge badge-gray">Win: ${c.outcome_prob||'?'}%</span>
+          ${c.lawyer_full_name ? `<span class="badge badge-purple" style="background:rgba(168,85,247,0.15);color:var(--purple);border:1px solid rgba(168,85,247,0.3);"><i class="fa fa-user-shield"></i> Assigned: ${esc(c.lawyer_full_name)}</span>` : `<span class="badge badge-yellow" style="background:rgba(234,179,8,0.15);color:var(--gold);border:1px solid rgba(234,179,8,0.3);"><i class="fa fa-info-circle"></i> Unassigned</span>`}
           <span class="text-muted" style="font-size:11px;margin-left:auto;">${fmtDate(c.created)}</span>
           <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();downloadNotice(${c.id})"><i class="fa fa-download"></i> Notice</button>
           <span class="text-muted" style="font-size:10px;"><i class="fa fa-eye"></i> Click to view details</span>

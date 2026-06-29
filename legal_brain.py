@@ -1123,6 +1123,10 @@ def get_legal_response(user_text, context_intent_idx=None, conversation_history=
         if detected_intent_idx != 35: # sexual assault takes precedence if both are present
             detected_intent_idx = 22
 
+    # Retain previous intent context for follow-up queries
+    if detected_intent_idx is None and context_intent_idx is not None and is_followup_query(norm):
+        detected_intent_idx = context_intent_idx
+
     # ── Mistral AI with full conversation history ───────────────────────────────
     if mistral_client:
         try:
@@ -1147,6 +1151,11 @@ def get_legal_response(user_text, context_intent_idx=None, conversation_history=
     ans, intent_idx = get_rule_based_answer(user_text)
     if ans:
         return (ans, False, intent_idx)
+
+    # If it is a follow-up query under a previous intent context, return the previous intent's template
+    if context_intent_idx is not None and is_followup_query(norm):
+        prev_ans = INTENTS[context_intent_idx]["ans"]()
+        return (prev_ans, False, context_intent_idx)
 
     # ── Ultimate fallback — generic legal guidance ───────────────────────────────
     return (
