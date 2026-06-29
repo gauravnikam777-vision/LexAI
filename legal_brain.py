@@ -858,6 +858,65 @@ def is_followup_query(norm_text):
     return False
 
 
+def get_sub_query_response(intent_idx, text):
+    norm = normalize(text)
+    
+    # Check sub-keywords
+    is_lawyer = any(w in norm for w in ['lawyer', 'vakil', 'advocate', 'vakeel', 'hire', 'consult'])
+    is_sections = any(w in norm for w in ['dhara', 'dharaye', 'dharayen', 'section', 'sections', 'ipc', 'bns', 'act'])
+    is_punishment = any(w in norm for w in ['saza', 'punishment', 'phansi', 'jail', 'qaid', 'penalty', 'imprisonment'])
+    
+    if intent_idx == 22: # Murder
+        if is_lawyer:
+            return "⚖️ <strong>Murder Case — Lawyer Guidance</strong><br><br>" \
+                   "Murder (IPC 302 / BNS 101) case ek Sessions Court trial matter hota hai. Iske liye:<br>" \
+                   "1. Aapko ek experienced <strong>Criminal Defense Lawyer</strong> (agar accused side hai) ya senior <strong>Criminal Trial Advocate</strong> (victim/witness side ke liye) consult karna chahiye.<br>" \
+                   "2. Lawyer ko Sessions Court trials aur criminal cross-examination ka achha experience hona zaroori hai.<br>" \
+                   "3. Aap platform ke 'Book Appointment' section se qualified Criminal Lawyers se consult kar sakte hain."
+        if is_sections:
+            return "⚖️ <strong>Murder Case — Applicable Sections</strong><br><br>" \
+                   "Murder case mein main sections yeh hote hain:<br>" \
+                   "• <strong>IPC 302 / BNS 101</strong>: Murder (Main charge)<br>" \
+                   "• <strong>IPC 304 / BNS 105</strong>: Culpable Homicide (not amounting to murder)<br>" \
+                   "• <strong>IPC 307 / BNS 109</strong>: Attempt to Murder<br>" \
+                   "• <strong>IPC 201 / BNS 238</strong>: Evidence destruction (saboot mitana)."
+        if is_punishment:
+            return "⚖️ <strong>Murder Case — Punishment / Saza</strong><br><br>" \
+                   "Murder (BNS 101 / IPC 302) ke under saza yeh hoti hai:<br>" \
+                   "• <strong>Death Penalty (Phansi)</strong> ya <strong>Life Imprisonment (Umar Qaid)</strong> + Fine.<br>" \
+                   "• Attempt to Murder (BNS 109 / IPC 307) ke under up to 10 saal ya life imprisonment ki saza ho sakti hai."
+
+    if intent_idx == 35: # Sexual Assault / Rape
+        if is_lawyer:
+            return "⚖️ <strong>Sexual Offense — Lawyer Guidance</strong><br><br>" \
+                   "Sexual assault/rape cases ke liye aapko ek senior <strong>Criminal Trial Lawyer</strong> or specialized advocate who handles POCSO/Rape cases consult karna chahiye. Aap 'Book Appointment' section se specialized advocates se consult kar sakte hain."
+        if is_sections:
+            return "⚖️ <strong>Sexual Offense — Applicable Sections</strong><br><br>" \
+                   "Sexual assault cases mein main laws yeh hain:<br>" \
+                   "• <strong>IPC 376 / BNS 63</strong>: Rape / Sexual Assault<br>" \
+                   "• <strong>IPC 354 / BNS 74</strong>: Outraging the modesty of a woman<br>" \
+                   "• <strong>POCSO Act 2012</strong>: Case involving a minor."
+        if is_punishment:
+            return "⚖️ <strong>Sexual Offense — Punishment / Saza</strong><br><br>" \
+                   "Rape (BNS 63 / IPC 376) ki saza **Rigorous Imprisonment of minimum 10 years up to Life Imprisonment** (or Death Penalty in severe cases) + fine hoti hai. Minor victim (POCSO) cases carry minimum 20 years to life/death penalty."
+
+    if intent_idx == 21: # Theft
+        if is_lawyer:
+            return "⚖️ <strong>Theft Case — Lawyer Guidance</strong><br><br>" \
+                   "Theft cases Magistrate Court level pe handle hote hain. Iske liye ek general <strong>Criminal Advocate</strong> jo bail aur criminal complaints file karta ho, wo hire karein."
+        if is_sections:
+            return "⚖️ <strong>Theft Case — Applicable Sections</strong><br><br>" \
+                   "Theft case mein main sections yeh hain:<br>" \
+                   "• <strong>IPC 378/379 / BNS 303</strong>: General Theft (up to 3 years)<br>" \
+                   "• <strong>IPC 380 / BNS 305</strong>: Theft in dwelling house/home (up to 7 years)<br>" \
+                   "• <strong>IPC 457 / BNS 332</strong>: Housebreaking by night (up to 14 years)."
+        if is_punishment:
+            return "⚖️ <strong>Theft Case — Punishment / Saza</strong><br><br>" \
+                   "Theft in a house/dwelling (BNS 305 / IPC 380) carries up to **7 years imprisonment** + fine. Housebreaking by night (BNS 332 / IPC 457) carries up to **14 years imprisonment**."
+
+    return None
+
+
 def get_rule_based_answer(text):
     """Returns (answer_html, intent_idx) or (None, None)."""
     norm = normalize(text)
@@ -878,8 +937,11 @@ def get_rule_based_answer(text):
     # Sort matches by score descending
     matches.sort(key=lambda x: x[0], reverse=True)
     
-    # If there is only one match, return it directly
+    # If there is only one match, return it directly (checking for sub-query overrides)
     if len(matches) == 1:
+        sub_ans = get_sub_query_response(matches[0][2], text)
+        if sub_ans:
+            return sub_ans, matches[0][2]
         return matches[0][1], matches[0][2]
         
     # Priority sorting: sexual_offense (0), criminal (1), others (2)
